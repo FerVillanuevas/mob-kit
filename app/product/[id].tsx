@@ -1,15 +1,17 @@
+import { useHeaderHeight } from "@react-navigation/elements";
 import { useQuery } from "@tanstack/react-query";
 import type {
-    ShopperBasketsTypes,
-    ShopperProductsTypes,
+  ShopperBasketsTypes,
+  ShopperProductsTypes,
 } from "commerce-sdk-clean";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    ScrollView,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import Carousel from "~/components/carousel";
 import { ProductVariations } from "~/components/commerce/product-variations";
@@ -184,6 +186,9 @@ export default function ProductPage() {
   >({});
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
+
+  const { width, height } = useWindowDimensions();
+  const h = useHeaderHeight();
 
   const {
     data: product,
@@ -369,7 +374,7 @@ export default function ProductPage() {
   ];
 
   return (
-    <View className="flex-1">
+    <View style={{ width, height: height - h }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Product Images */}
         {images.length > 0 && (
@@ -393,8 +398,8 @@ export default function ProductPage() {
         )}
 
         <View className="p-4 gap-3" style={{ paddingBottom: 120 }}>
-          <View className="flex flex-row justify-between items-center">
-            <H1 className="text-2xl font-bold leading-tight">{product.name}</H1>
+          <View className="flex flex-row justify-between items-center gap-4">
+            <H1 className="text-2xl font-bold leading-tight flex-1">{product.name}</H1>
             <TouchableOpacity
               onPress={handleAddToWishList}
               className={cn(

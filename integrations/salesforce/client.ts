@@ -1,8 +1,8 @@
 import { ShopperLogin } from "commerce-sdk-clean";
 import {
-    loginAsGuest,
-    loginRegisteredUserB2C,
-    refreshAccessToken,
+  loginAsGuest,
+  loginRegisteredUserB2C,
+  refreshAccessToken,
 } from "~/integrations/salesforce/helpers";
 import { SalesforceSessionManager } from "~/integrations/salesforce/session-manager";
 import type { SalesforceConfig } from "~/integrations/salesforce/types/params";
@@ -119,8 +119,6 @@ export class SalesforceCommerceClient {
         usid: usid,
       }
     );
-
-    console.log(response);
 
     await this.sessionManager.saveTokens({
       accessToken: response.access_token,
