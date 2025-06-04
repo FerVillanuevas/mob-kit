@@ -39,3 +39,4 @@ app-example
 ios
 .env
 eas.json
+*.ipa
