@@ -1,59 +1,63 @@
+import { useHeaderHeight } from "@react-navigation/elements";
+import { Tabs } from "expo-router";
+import { useWindowDimensions, View } from "react-native";
 import Icon from "~/components/icon";
-import { MaterialTopTabs } from "~/components/top-tabs";
-
-/*   const steps = [
-    { id: 0, name: "Contact Info" },
-    { id: 1, name: "Shipping Address" },
-    { id: 2, name: "Shipping Options" },
-    { id: 3, name: "Payment" },
-    { id: 4, name: "Review" },
-  ]; */
 
 export default function CheckoutLayout() {
+  const { width, height } = useWindowDimensions();
+  const h = useHeaderHeight();
+
   return (
-    <MaterialTopTabs
-      screenOptions={{
-        tabBarShowLabel: false,
-        swipeEnabled: false,
-        lazy: true,
-      }}
-      screenListeners={{
-        tabPress: (e) => {
-          e.preventDefault();
-          return;
-        },
-      }}
-    >
-      <MaterialTopTabs.Screen
-        name="customer"
-        options={{
-          tabBarIcon: () => <Icon name="people" />,
+    <View style={{ width, height: height - h }}>
+      <Tabs
+        screenListeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            return;
+          },
         }}
-      />
-      <MaterialTopTabs.Screen
-        name="address"
-        options={{
-          tabBarIcon: () => <Icon name="home" />,
-        }}
-      />
-      <MaterialTopTabs.Screen
-        name="shipping"
-        options={{
-          tabBarIcon: () => <Icon name="rocket-outline" />,
-        }}
-      />
-      <MaterialTopTabs.Screen
-        name="payment"
-        options={{
-          tabBarIcon: () => <Icon name="card" />,
-        }}
-      />
-      <MaterialTopTabs.Screen
-        name="review"
-        options={{
-          tabBarIcon: () => <Icon name="receipt-outline" />,
-        }}
-      />
-    </MaterialTopTabs>
+      >
+        <Tabs.Screen
+          name="customer"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Icon name={focused ? "people" : "people-outline"} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="address"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Icon name={focused ? "home" : "home-outline"} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="shipping"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Icon name={focused ? "rocket" : "rocket-outline"} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="payment"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Icon name={focused ? "card" : "card-outline"} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="review"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Icon name={focused ? "receipt" : "receipt-outline"} />
+            ),
+          }}
+        />
+      </Tabs>
+    </View>
   );
 }

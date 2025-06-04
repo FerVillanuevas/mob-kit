@@ -66,6 +66,7 @@ const RootComponent = () => {
     <Stack>
       {/* (tabs)/index file, App entry point, see expo for reference */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="(checkout)" options={{ title: "" }} />
     </Stack>
   );
 };

@@ -54,7 +54,7 @@ const Form = ({
   const handleSubmit = async (data: ShippingAddresFormValues) => {
     if (!basket?.basketId) return;
 
-    updateShippingAddressForShipmentMutation.mutateAsync({
+    await updateShippingAddressForShipmentMutation.mutateAsync({
       params: {
         basketId: basket.basketId,
         shipmentId: "me",
