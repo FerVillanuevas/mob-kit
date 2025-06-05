@@ -1,20 +1,27 @@
-/* Review this latter, loading state is horrible */
-
 import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
-import { BlurView } from "expo-blur";
 import { router, useLocalSearchParams } from "expo-router";
+import { cssInterop } from "nativewind";
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Drawer } from "react-native-drawer-layout";
 import FiltersContent from "~/components/commerce/filter-content";
+import { HeaderSkeleton } from "~/components/commerce/header-skeleton";
+import { Pagination } from "~/components/commerce/pagination";
 import ProductHit from "~/components/commerce/product-hit";
+import { ProductGridSkeleton } from "~/components/commerce/product-skeleton";
 import Icon from "~/components/icon";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Skeleton } from "~/components/ui/skeleton";
 import { Text } from "~/components/ui/text";
 import { H1, H4 } from "~/components/ui/typography";
 import { getProductsQueryOptions } from "~/integrations/salesforce/options/products";
 import { REQUESTED_LIMIT } from "~/lib/constants";
+
+const StyledDrawer = cssInterop(Drawer, {
+  className: "drawerStyle",
+});
 
 // Helper function to parse search params into the expected structure
 const parseSearchParams = (params: Record<string, string | string[]>) => {
@@ -68,12 +75,11 @@ export default function CategoryPage() {
     }
   });
 
-  console.log("Refine array for API:", refineArray);
-
   const {
     data: products,
     isLoading,
     isFetching,
+    refetch,
   } = useQuery(
     getProductsQueryOptions({
       refine: refineArray,
@@ -108,30 +114,27 @@ export default function CategoryPage() {
       Object.keys(newSearch.refinements).length > 0
     ) {
       Object.entries(newSearch.refinements).forEach(([key, values]) => {
+        //@ts-ignore
         if (values.length > 0) {
           // Join with commas for URL serialization
+          //@ts-ignore
           newParams[key] = values.join(",");
         }
       });
     }
 
-    console.log("Navigating with params:", newParams);
     router.replace({
       pathname: "/category/[id]",
+      //@ts-ignore
       params: newParams,
     });
   };
 
   const handleSelectedRefinement = (attributeId: string, value: string) => {
-    console.log("Handling refinement:", attributeId, value);
-    console.log("Current refinements:", refinements);
-
     const currentValues = refinements[attributeId] || [];
     const newValues = currentValues.includes(value)
       ? currentValues.filter((v) => v !== value)
       : [...currentValues, value];
-
-    console.log("New values:", newValues);
 
     const newRefinements = { ...refinements };
     if (newValues.length === 0) {
@@ -139,8 +142,6 @@ export default function CategoryPage() {
     } else {
       newRefinements[attributeId] = newValues;
     }
-
-    console.log("New refinements:", newRefinements);
 
     navigate((prev) => ({
       ...prev,
@@ -175,59 +176,63 @@ export default function CategoryPage() {
 
   // Use the current products data even while loading new data
   const productData = products;
+  const isInitialLoading = isLoading && !productData;
 
   return (
-    <Drawer
+    <StyledDrawer
       open={open}
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
+      className="bg-background"
       drawerPosition="right"
-      drawerStyle={{ backgroundColor: "transparent" }}
       renderDrawerContent={() => {
         return (
-          <BlurView style={StyleSheet.absoluteFill} tint="systemChromeMaterial">
-            <ScrollView>
-              <FiltersContent
-                refinements={productData?.refinements || []}
-                productSorts={productData?.sortingOptions || []}
-                selectedRefinements={refinements}
-                selectedSort={sort}
-                handleSelectedRefinement={handleSelectedRefinement}
-                handleOnSortChange={handleOnSortChange}
-                handleClearFilters={handleClearFilters}
-                isLoading={isLoading || isFetching}
-              />
-            </ScrollView>
-          </BlurView>
+          <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+            <FiltersContent
+              refinements={productData?.refinements || []}
+              productSorts={productData?.sortingOptions || []}
+              selectedRefinements={refinements}
+              selectedSort={sort}
+              handleSelectedRefinement={handleSelectedRefinement}
+              handleOnSortChange={handleOnSortChange}
+              handleClearFilters={handleClearFilters}
+              isLoading={isLoading || isFetching}
+            />
+          </ScrollView>
         );
       }}
     >
       <FlashList
         data={productData?.hits}
         ListEmptyComponent={() => {
-          if (isLoading) {
+          if (isInitialLoading) {
             return (
-              <View className="flex-1 items-center justify-center py-20">
-                <ActivityIndicator size="large" />
-                <Text className="mt-4 text-muted-foreground">
-                  Loading products...
-                </Text>
+              <View className="flex-1">
+                <HeaderSkeleton />
+                <ProductGridSkeleton numColumns={2} numItems={6} />
               </View>
             );
           }
 
           return (
-            <View className="flex-1 items-center justify-center py-20">
+            <View className="flex-1 items-center justify-center px-6 py-20">
               <Icon
                 name="search"
                 size={48}
-                className="mb-4 text-muted-foreground"
+                className="mb-6 text-muted-foreground"
               />
-              <Text className="text-lg font-medium">No products found</Text>
-              <Text className="mb-4 mt-2 max-w-xs text-center text-muted-foreground">
+              <Text className="mb-2 text-center text-xl font-medium">
+                No products found
+              </Text>
+              <Text className="mb-8 text-center text-muted-foreground">
                 Try adjusting your filters or search for something else
               </Text>
-              <Button variant="outline" onPress={handleClearFilters}>
+              <Button
+                variant="outline"
+                onPress={handleClearFilters}
+                className="min-w-[180px]"
+              >
+                <Icon name="refresh" size={16} className="mr-2" />
                 <Text>Clear Filters</Text>
               </Button>
             </View>
@@ -235,18 +240,21 @@ export default function CategoryPage() {
         }}
         ListHeaderComponent={() => {
           return (
-            <View className="flex flex-row items-end justify-between p-4">
+            <View className="mb-2 flex-row items-end justify-between p-4">
               <View>
                 <H1>Products</H1>
-                <H4>Total: {productData?.total || 0}</H4>
-                {(isLoading || isFetching) && (
-                  <View className="flex-row items-center">
-                    <ActivityIndicator size="small" className="mr-2" />
-                    <Text className="text-xs text-muted-foreground">
-                      Updating results...
-                    </Text>
-                  </View>
-                )}
+                <View className="mt-1 flex-row items-center">
+                  <H4 className="text-muted-foreground">
+                    {productData?.total
+                      ? `${productData.total} results`
+                      : "Loading results..."}
+                  </H4>
+                  {isFetching && !isInitialLoading && (
+                    <View className="ml-2">
+                      <Skeleton className="h-4 w-4 rounded-full" pulse />
+                    </View>
+                  )}
+                </View>
               </View>
 
               <Button
@@ -254,17 +262,14 @@ export default function CategoryPage() {
                 onPress={() => {
                   setOpen(true);
                 }}
-                className="flex-row items-center gap-2"
+                className="flex-row items-center gap-2 shadow-sm"
               >
-                <Icon name="options" size={16} />
-                <Text>Filters</Text>
                 {activeFiltersCount > 0 && (
-                  <View className="h-5 w-5 items-center justify-center rounded-full bg-primary-foreground">
-                    <Text className="text-xs text-primary">
-                      {activeFiltersCount}
-                    </Text>
-                  </View>
+                  <Badge variant="destructive">
+                    <Text>{activeFiltersCount}</Text>
+                  </Badge>
                 )}
+                <Text>Filters</Text>
               </Button>
             </View>
           );
@@ -287,7 +292,21 @@ export default function CategoryPage() {
             />
           );
         }}
+        ListFooterComponent={() => (
+          <View className="px-4 py-6">
+            <Pagination
+              total={productData?.total || 0}
+              offset={offset}
+              requestedLimit={REQUESTED_LIMIT}
+              navigate={navigate}
+            />
+          </View>
+        )}
+        refreshing={isFetching && !isInitialLoading}
+        onRefresh={() => {
+          refetch();
+        }}
       />
-    </Drawer>
+    </StyledDrawer>
   );
 }
