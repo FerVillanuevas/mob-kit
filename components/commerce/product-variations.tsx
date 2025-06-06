@@ -1,4 +1,4 @@
-import type { ShopperProductsTypes } from "commerce-sdk-clean"
+import type { ShopperProductsTypes } from "commerce-sdk-isomorphic"
 import { TouchableOpacity, View } from "react-native"
 import { Badge } from "~/components/ui/badge"
 import { Text } from "~/components/ui/text"

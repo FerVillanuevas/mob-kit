@@ -1,8 +1,8 @@
-import { ShopperLogin } from "commerce-sdk-clean";
+import { ShopperLogin } from "commerce-sdk-isomorphic";
 import {
-  loginAsGuest,
-  loginRegisteredUserB2C,
-  refreshAccessToken,
+    loginAsGuest,
+    loginRegisteredUserB2C,
+    refreshAccessToken,
 } from "~/integrations/salesforce/helpers";
 import { SalesforceSessionManager } from "~/integrations/salesforce/session-manager";
 import type { SalesforceConfig } from "~/integrations/salesforce/types/params";

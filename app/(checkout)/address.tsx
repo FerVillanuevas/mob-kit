@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { ShopperBasketsTypes, ShopperCustomersTypes } from "commerce-sdk-clean";
+import { ShopperBasketsTypes, ShopperCustomersTypes } from "commerce-sdk-isomorphic";
 import { Redirect, router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";

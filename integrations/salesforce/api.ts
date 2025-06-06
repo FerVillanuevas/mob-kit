@@ -11,7 +11,7 @@ import {
     ShopperSearch,
     ShopperSeo,
     ShopperStores,
-} from "commerce-sdk-clean";
+} from "commerce-sdk-isomorphic";
 import type { SalesforceCommerceClient } from "~/integrations/salesforce/client";
 
 export class SalesforceAPI {

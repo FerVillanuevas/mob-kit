@@ -1,8 +1,8 @@
-import { ShopperCustomersTypes } from "commerce-sdk-clean";
+import { ShopperCustomersTypes } from "commerce-sdk-isomorphic";
 import { SalesforceCommerceClient } from "~/integrations/salesforce/client";
 import {
-    getSalesforceAPI,
-    salesforceConfig,
+  getSalesforceAPI,
+  salesforceConfig,
 } from "~/integrations/salesforce/server/config";
 import { RegisterFormData } from "~/lib/forms/customer";
 
@@ -85,6 +85,7 @@ export const createProductList = async ({ data }) => {
     },
   });
 };
+
 export const addItemToProductList = async ({ data }) => {
   const { api, client } = await getSalesforceAPI();
   const customerId = await client.getCustomerId();
@@ -145,6 +146,7 @@ export const updateCustomerAddress = async ({ data }) => {
     body: data.body,
   });
 };
+
 export const deleteCustomerAddress = async ({ data }) => {
   const { api, client } = await getSalesforceAPI();
   const shopperCustomers = await api.shopperCustomers();
