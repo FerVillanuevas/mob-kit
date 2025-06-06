@@ -9,14 +9,19 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.fervillanuevas.mob-kit"
+      "appleTeamId": "AAAA",
+      "supportsTablet": false,
+      "bundleIdentifier": "com.fervillanuevas.mob-kit",
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.fervillanuevas.data"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.fervillanuevas.mobkit"
     },
     "web": {
       "bundler": "metro",
@@ -33,7 +38,10 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "@bacons/apple-targets",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
