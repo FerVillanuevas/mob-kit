@@ -1,12 +1,20 @@
+import { useQuery } from "@tanstack/react-query";
 import { ScrollView, View } from "react-native";
 import HorizontalProducts from "~/components/commerce/horizontal-products";
 import Icon from "~/components/icon";
 import { H3 } from "~/components/ui/typography";
+import getProductRecsQueryOptions from "~/integrations/salesforce/options/einstein";
 
 export default function Index() {
+  const { data } = useQuery(
+    getProductRecsQueryOptions({
+      recId: "viewed-recently-einstein",
+    }),
+  );
+
   return (
     <ScrollView>
-      <View className="w-full aspect-square justify-center flex items-center bg-secondary">
+      <View className="flex aspect-square w-full items-center justify-center bg-secondary">
         <H3>
           Made with <Icon name="heart" className="text-destructive" /> and Expo
         </H3>
