@@ -1,7 +1,7 @@
 import { customRandom, urlAlphabet } from "nanoid";
 import seedrandom, { PRNG } from "seedrandom";
 
-import { ShopperLogin, ShopperLoginTypes } from "commerce-sdk-clean";
+import type { ShopperLogin, ShopperLoginTypes } from "commerce-sdk-isomorphic";
 
 import * as Crypto from "expo-crypto";
 

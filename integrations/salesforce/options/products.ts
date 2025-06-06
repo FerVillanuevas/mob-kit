@@ -1,21 +1,21 @@
 import {
-    getCategory,
-    getProduct,
-    getProducts,
-    getProductsByIds,
+  getCategory,
+  getProduct,
+  getProducts,
+  getProductsByIds,
 } from "~/integrations/salesforce/server/products";
 
 import type {
-    GetProductParams,
-    GetProductsByIdsParams,
-    ProductSearchParams,
+  GetProductParams,
+  GetProductsByIdsParams,
+  ProductSearchParams,
 } from "~/integrations/salesforce/types/params";
 
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import {
-    ShopperProductsTypes,
-    ShopperSearchTypes,
-} from "commerce-sdk-clean";
+import type {
+  ShopperProductsTypes,
+  ShopperSearchTypes,
+} from "commerce-sdk-isomorphic";
 
 export const getProductsQueryOptions = (params: ProductSearchParams) => {
   return queryOptions<ShopperSearchTypes.ProductSearchResult>({

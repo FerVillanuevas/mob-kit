@@ -1,4 +1,4 @@
-import { ShopperBasketsTypes } from "commerce-sdk-clean";
+import type { ShopperBasketsTypes } from "commerce-sdk-isomorphic";
 import { Address } from "~/integrations/salesforce/types/api";
 
 export interface SalesforceConfig {
