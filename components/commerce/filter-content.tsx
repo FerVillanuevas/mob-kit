@@ -1,4 +1,4 @@
-import type { ShopperSearchTypes } from "commerce-sdk-clean"
+import type { ShopperSearchTypes } from "commerce-sdk-isomorphic"
 import { ScrollView, TouchableOpacity, View } from "react-native"
 import Icon from "~/components/icon"
 import { Badge } from "~/components/ui/badge"

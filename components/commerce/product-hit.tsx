@@ -1,9 +1,9 @@
-import { ShopperSearchTypes } from "commerce-sdk-clean";
+import { ShopperSearchTypes } from "commerce-sdk-isomorphic";
 import currency from "currency.js";
 import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
+    TouchableOpacity,
+    TouchableOpacityProps,
+    View,
 } from "react-native";
 import Image from "~/components/image";
 import { Text } from "~/components/ui/text";

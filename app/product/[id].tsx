@@ -1,17 +1,17 @@
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useQuery } from "@tanstack/react-query";
 import type {
-  ShopperBasketsTypes,
-  ShopperProductsTypes,
-} from "commerce-sdk-clean";
+    ShopperBasketsTypes,
+    ShopperProductsTypes,
+} from "commerce-sdk-isomorphic";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  ScrollView,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
+    ActivityIndicator,
+    ScrollView,
+    TouchableOpacity,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import Carousel from "~/components/carousel";
 import { ProductVariations } from "~/components/commerce/product-variations";
