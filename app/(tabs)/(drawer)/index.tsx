@@ -5,12 +5,29 @@ import Icon from "~/components/icon";
 import { H3 } from "~/components/ui/typography";
 import getProductRecsQueryOptions from "~/integrations/salesforce/options/einstein";
 
+import { ExtensionStorage } from "@bacons/apple-targets";
+import { useEffect } from "react";
+
+// Create a storage object with the App Group.
+const storage = new ExtensionStorage(
+  // Your app group identifier. Should match the values in the app.json and expo-target.config.json.
+  "group.fervillanuevas.data",
+);
+
 export default function Index() {
   const { data } = useQuery(
     getProductRecsQueryOptions({
       recId: "viewed-recently-einstein",
     }),
   );
+
+  useEffect(() => {
+    if (data) {
+
+      storage.set("recomendation", JSON.stringify(data));
+      ExtensionStorage.reloadWidget();
+    }
+  }, [data]);
 
   return (
     <ScrollView>
