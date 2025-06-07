@@ -1,8 +1,6 @@
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useQuery } from "@tanstack/react-query";
-import type {
-  ShopperBasketsTypes
-} from "commerce-sdk-isomorphic";
+import type { ShopperBasketsTypes } from "commerce-sdk-isomorphic";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -17,10 +15,8 @@ import { ProductVariations } from "~/components/commerce/product-variations";
 import Icon from "~/components/icon";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent } from "~/components/ui/card";
 import MaskedBlur from "~/components/ui/masked-blur";
 import { Separator } from "~/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Text } from "~/components/ui/text";
 import { H1, H3 } from "~/components/ui/typography";
 import { useWishList } from "~/hooks/use-wishlist";
@@ -365,76 +361,15 @@ export default function ProductPage() {
               />
             )}
 
-          {/* Tab Headers */}
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full flex-col gap-1.5"
-          >
-            <TabsList className="w-full flex-row">
-              {tabs.map((tab) => (
-                <TabsTrigger key={tab.id} value={tab.id} className="flex-1">
-                  <Text>{tab.label}</Text>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            <TabsContent value="description">
-              <Card className="mt-4">
-                <CardContent className="p-4">
-                  {product.longDescription ? (
-                    <Text className="text-sm leading-relaxed">
-                      {product.longDescription.replace(/<[^>]*>/g, "")}
-                    </Text>
-                  ) : (
-                    <Text className="text-sm text-muted-foreground">
-                      No detailed description available for this product.
-                    </Text>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="specifications">
-              <Card className="mt-4">
-                <CardContent className="space-y-4 p-4">
-                  {product.manufacturerName && (
-                    <View className="space-y-1">
-                      <Text className="text-sm font-medium">Manufacturer</Text>
-                      <Text className="text-sm text-muted-foreground">
-                        {product.manufacturerName}
-                      </Text>
-                    </View>
-                  )}
-                  {product.manufacturerSku && (
-                    <View className="space-y-1">
-                      <Text className="text-sm font-medium">
-                        Manufacturer SKU
-                      </Text>
-                      <Text className="text-sm text-muted-foreground">
-                        {product.manufacturerSku}
-                      </Text>
-                    </View>
-                  )}
-                  {product.upc && (
-                    <View className="space-y-1">
-                      <Text className="text-sm font-medium">UPC</Text>
-                      <Text className="text-sm text-muted-foreground">
-                        {product.upc}
-                      </Text>
-                    </View>
-                  )}
-                  {product.unit && (
-                    <View className="space-y-1">
-                      <Text className="text-sm font-medium">Unit</Text>
-                      <Text className="text-sm text-muted-foreground">
-                        {product.unit}
-                      </Text>
-                    </View>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          {product.longDescription ? (
+            <Text className="text-sm leading-relaxed">
+              {product.longDescription.replace(/<[^>]*>/g, "")}
+            </Text>
+          ) : (
+            <Text className="text-sm text-muted-foreground">
+              No detailed description available for this product.
+            </Text>
+          )}
         </View>
       </ScrollView>
 
