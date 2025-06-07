@@ -23,8 +23,7 @@ export default function Index() {
 
   useEffect(() => {
     if (data) {
-
-      storage.set("recomendation", JSON.stringify(data));
+      storage.set("recommendations", JSON.stringify(data));
       ExtensionStorage.reloadWidget();
     }
   }, [data]);

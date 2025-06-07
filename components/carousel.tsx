@@ -1,29 +1,38 @@
 import { Galeria } from "@nandorojo/galeria";
-import { useRef } from "react";
-import { Animated, FlatList, View, useWindowDimensions } from "react-native";
+import { useWindowDimensions, View } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  SharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 import Image from "~/components/image";
 
 import { cn } from "~/lib/utils";
 
+
 export default function Carousel({ data }: { data: string[] }) {
   const { width } = useWindowDimensions();
-  const scrollX = useRef(new Animated.Value(0)).current;
+  const scrollX = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollX.value = event.contentOffset.x;
+    },
+  });
 
   return (
     <View>
       <Galeria urls={data}>
-        <FlatList
+        <Animated.FlatList
           data={data}
           horizontal
           showsHorizontalScrollIndicator={false}
           pagingEnabled
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            {
-              useNativeDriver: false,
-            }
-          )}
-          scrollEventThrottle={32}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
           renderItem={({ item, index: i }) => {
             return (
               <View
@@ -44,25 +53,49 @@ export default function Carousel({ data }: { data: string[] }) {
 
       {data && (
         <View className="absolute bottom-3 w-full flex flex-row gap-2 items-center justify-center">
-          {data.map((_, i) => {
-            const input_range = [(i - 1) * width, i * width, (i + 1) * width];
-
-            const opacity = scrollX.interpolate({
-              inputRange: input_range,
-              outputRange: [0.5, 1, 0.5],
-              extrapolate: "clamp",
-            });
-
-            return (
-              <Animated.View
-                key={`media_${i}`}
-                style={{ opacity }}
-                className={cn("h-1.5 w-1.5 rounded-full bg-border")}
-              />
-            );
-          })}
+          {data.map((_, i) => (
+            <DotIndicator
+              key={`media_${i}`}
+              index={i}
+              scrollX={scrollX}
+              width={width}
+            />
+          ))}
         </View>
       )}
     </View>
+  );
+}
+
+// Separate component for each dot to optimize performance
+function DotIndicator({
+  index,
+  scrollX,
+  width,
+}: {
+  index: number;
+  scrollX: SharedValue<number>;
+  width: number;
+}) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+    
+    const opacity = interpolate(
+      scrollX.value,
+      inputRange,
+      [0.5, 1, 0.5],
+      Extrapolation.CLAMP
+    );
+
+    return {
+      opacity,
+    };
+  });
+
+  return (
+    <Animated.View
+      style={animatedStyle}
+      className={cn("h-1.5 w-1.5 rounded-full bg-border")}
+    />
   );
 }
