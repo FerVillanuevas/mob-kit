@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import Carousel from "~/components/carousel";
+import ProductRecomendations from "~/components/commerce/product-recomandations";
 import { ProductVariations } from "~/components/commerce/product-variations";
 import Icon from "~/components/icon";
 import { Badge } from "~/components/ui/badge";
@@ -370,6 +371,11 @@ export default function ProductPage() {
               No detailed description available for this product.
             </Text>
           )}
+
+          <ProductRecomendations
+            products={[{ id }]}
+            recId="pdp-similar-items"
+          />
         </View>
       </ScrollView>
 
