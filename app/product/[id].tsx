@@ -1,17 +1,16 @@
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useQuery } from "@tanstack/react-query";
 import type {
-    ShopperBasketsTypes,
-    ShopperProductsTypes,
+  ShopperBasketsTypes
 } from "commerce-sdk-isomorphic";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    ScrollView,
-    TouchableOpacity,
-    useWindowDimensions,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import Carousel from "~/components/carousel";
 import { ProductVariations } from "~/components/commerce/product-variations";
@@ -42,7 +41,7 @@ function getDefaultSelections(variationAttributes: any[], variants: any[]) {
         return variants?.some(
           (variant) =>
             variant.variationValues?.[attr.id] === value.value &&
-            variant.orderable !== false
+            variant.orderable !== false,
         );
       });
 
@@ -103,75 +102,6 @@ const Price = ({
   );
 };
 
-const ProductInBundleCard = ({
-  product,
-}: {
-  product: ShopperProductsTypes.Product;
-}) => {
-  const primaryImage = product.imageGroups?.find(
-    (group) => group.viewType === "large"
-  )?.images?.[0];
-
-  return (
-    <Card className="w-48 mr-4 overflow-hidden">
-      <View className="relative aspect-square">
-        {primaryImage ? (
-          <View className="w-full h-full bg-muted rounded-t-lg" />
-        ) : (
-          <View className="bg-muted flex h-full w-full items-center justify-center rounded-t-lg">
-            <Text className="text-muted-foreground text-sm">No Image</Text>
-          </View>
-        )}
-        {product.productPromotions?.[0] && (
-          <Badge className="absolute top-2 left-2 bg-destructive">
-            <Text className="text-destructive-foreground text-xs">Sale</Text>
-          </Badge>
-        )}
-      </View>
-      <CardContent className="p-3 space-y-2">
-        {product.brand && (
-          <Badge variant="outline">
-            <Text className="text-xs">{product.brand}</Text>
-          </Badge>
-        )}
-        <Text className="text-sm font-semibold" numberOfLines={2}>
-          {product.name}
-        </Text>
-        <Price
-          price={product.price}
-          currency={product.currency}
-          priceMax={product.priceMax}
-          promotion={product.productPromotions?.[0]}
-          className="text-base"
-        />
-        <View className="flex-row items-center justify-between pt-1">
-          <View className="flex-row items-center gap-1">
-            {product.inventory?.stockLevel !== 0 ? (
-              <>
-                <Icon
-                  name="checkmark-circle"
-                  className="text-green-600"
-                  size={12}
-                />
-                <Text className="text-xs font-medium text-green-600">
-                  In Stock
-                </Text>
-              </>
-            ) : (
-              <>
-                <Icon name="alert-circle" className="text-red-600" size={12} />
-                <Text className="text-xs font-medium text-red-600">
-                  Out of Stock
-                </Text>
-              </>
-            )}
-          </View>
-        </View>
-      </CardContent>
-    </Card>
-  );
-};
-
 export default function ProductPage() {
   const { id, variations: urlVariations } = useLocalSearchParams<{
     id: string;
@@ -209,7 +139,7 @@ export default function ProductPage() {
         "bundled_products",
       ],
       allImages: true,
-    })
+    }),
   );
 
   const addToBasketMutation = useAddItemToBasketMutation();
@@ -220,7 +150,7 @@ export default function ProductPage() {
     if (product?.variationAttributes && product?.variants) {
       const defaultSelections = getDefaultSelections(
         product.variationAttributes,
-        product.variants
+        product.variants,
       );
 
       // Parse URL variations if they exist
@@ -283,7 +213,7 @@ export default function ProductPage() {
     if (stepQuantity > 1) {
       const remainder = (newQuantity - minOrderQuantity) % stepQuantity;
       setQuantity(
-        remainder === 0 ? newQuantity : newQuantity - remainder + stepQuantity
+        remainder === 0 ? newQuantity : newQuantity - remainder + stepQuantity,
       );
     } else {
       setQuantity(newQuantity);
@@ -335,12 +265,12 @@ export default function ProductPage() {
   };
 
   const wishListed = wishList?.customerProductListItems?.some(
-    (p) => p.id === id
+    (p) => p.id === id,
   );
 
   if (isLoading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
+      <View className="flex-1 items-center justify-center bg-background">
         <ActivityIndicator size="large" />
         <Text className="mt-4 text-muted-foreground">Loading product...</Text>
       </View>
@@ -349,10 +279,10 @@ export default function ProductPage() {
 
   if (isError || !product) {
     return (
-      <View className="flex-1 justify-center items-center bg-background p-4">
-        <Icon name="alert-circle" className="text-destructive mb-4" size={48} />
-        <H3 className="text-center mb-2">Product Not Found</H3>
-        <Text className="text-center text-muted-foreground mb-4">
+      <View className="flex-1 items-center justify-center bg-background p-4">
+        <Icon name="alert-circle" className="mb-4 text-destructive" size={48} />
+        <H3 className="mb-2 text-center">Product Not Found</H3>
+        <Text className="mb-4 text-center text-muted-foreground">
           The product youre looking for doesnt exist or has been removed.
         </Text>
         <Button onPress={() => router.back()}>
@@ -363,7 +293,7 @@ export default function ProductPage() {
   }
 
   const largeImages = product.imageGroups?.find(
-    (ig) => ig.viewType === "large"
+    (ig) => ig.viewType === "large",
   );
   const images =
     largeImages?.images?.map((image) => image.disBaseLink || "") || [];
@@ -380,14 +310,14 @@ export default function ProductPage() {
         {images.length > 0 && (
           <View className="relative">
             {promotion && (
-              <Badge className="absolute top-4 left-4 z-10 bg-destructive">
+              <Badge className="absolute left-4 top-4 z-10 bg-destructive">
                 <View className="flex-row items-center">
                   <Icon
                     name="flash"
-                    className="text-destructive-foreground mr-1"
+                    className="mr-1 text-destructive-foreground"
                     size={12}
                   />
-                  <Text className="text-destructive-foreground text-xs">
+                  <Text className="text-xs text-destructive-foreground">
                     {promotion.calloutMsg || "Special Offer"}
                   </Text>
                 </View>
@@ -397,16 +327,18 @@ export default function ProductPage() {
           </View>
         )}
 
-        <View className="p-4 gap-3" style={{ paddingBottom: 120 }}>
-          <View className="flex flex-row justify-between items-center gap-4">
-            <H1 className="text-2xl font-bold leading-tight flex-1">{product.name}</H1>
+        <View className="gap-3 p-4" style={{ paddingBottom: 120 }}>
+          <View className="flex flex-row items-center justify-between gap-4">
+            <H1 className="flex-1 text-2xl font-bold leading-tight">
+              {product.name}
+            </H1>
             <TouchableOpacity
               onPress={handleAddToWishList}
               className={cn(
-                "p-2 rounded-full border",
+                "rounded-full border p-2",
                 wishListed
-                  ? "bg-destructive border-destructive"
-                  : "bg-background border-border"
+                  ? "border-destructive bg-destructive"
+                  : "border-border bg-background",
               )}
             >
               <Icon
@@ -439,7 +371,7 @@ export default function ProductPage() {
             onValueChange={setActiveTab}
             className="w-full flex-col gap-1.5"
           >
-            <TabsList className="flex-row w-full">
+            <TabsList className="w-full flex-row">
               {tabs.map((tab) => (
                 <TabsTrigger key={tab.id} value={tab.id} className="flex-1">
                   <Text>{tab.label}</Text>
@@ -455,7 +387,7 @@ export default function ProductPage() {
                       {product.longDescription.replace(/<[^>]*>/g, "")}
                     </Text>
                   ) : (
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       No detailed description available for this product.
                     </Text>
                   )}
@@ -464,11 +396,11 @@ export default function ProductPage() {
             </TabsContent>
             <TabsContent value="specifications">
               <Card className="mt-4">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className="space-y-4 p-4">
                   {product.manufacturerName && (
                     <View className="space-y-1">
                       <Text className="text-sm font-medium">Manufacturer</Text>
-                      <Text className="text-muted-foreground text-sm">
+                      <Text className="text-sm text-muted-foreground">
                         {product.manufacturerName}
                       </Text>
                     </View>
@@ -478,7 +410,7 @@ export default function ProductPage() {
                       <Text className="text-sm font-medium">
                         Manufacturer SKU
                       </Text>
-                      <Text className="text-muted-foreground text-sm">
+                      <Text className="text-sm text-muted-foreground">
                         {product.manufacturerSku}
                       </Text>
                     </View>
@@ -486,7 +418,7 @@ export default function ProductPage() {
                   {product.upc && (
                     <View className="space-y-1">
                       <Text className="text-sm font-medium">UPC</Text>
-                      <Text className="text-muted-foreground text-sm">
+                      <Text className="text-sm text-muted-foreground">
                         {product.upc}
                       </Text>
                     </View>
@@ -494,7 +426,7 @@ export default function ProductPage() {
                   {product.unit && (
                     <View className="space-y-1">
                       <Text className="text-sm font-medium">Unit</Text>
-                      <Text className="text-muted-foreground text-sm">
+                      <Text className="text-sm text-muted-foreground">
                         {product.unit}
                       </Text>
                     </View>
@@ -506,7 +438,7 @@ export default function ProductPage() {
         </View>
       </ScrollView>
 
-      <View className="absolute inset-x-0 bottom-0 px-4 pt-8 pb-safe flex flex-row gap-8">
+      <View className="pb-safe absolute inset-x-0 bottom-0 flex flex-row gap-8 px-4 pt-8">
         <MaskedBlur />
 
         {/* Add to Cart Button */}
@@ -528,7 +460,7 @@ export default function ProductPage() {
             ) : (
               <Icon name="bag" className="text-primary-foreground" size={20} />
             )}
-            <Text className="text-primary-foreground font-medium">
+            <Text className="font-medium text-primary-foreground">
               {isInStock ? "Add to Cart" : "Out of Stock"}
             </Text>
           </View>

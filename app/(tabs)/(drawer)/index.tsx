@@ -25,6 +25,7 @@ export default function Index() {
     if (data) {
 
       storage.set("recomendation", JSON.stringify(data));
+
       ExtensionStorage.reloadWidget();
     }
   }, [data]);
