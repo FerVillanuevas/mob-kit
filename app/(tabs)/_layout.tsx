@@ -15,7 +15,7 @@ export default function TabsLayout() {
   if (isLoading) {
     /* Ensure customer is loaded */
     return (
-      <View className="flex flex-1 justify-center items-center">
+      <View className="flex flex-1 items-center justify-center">
         <ActivityIndicator />
       </View>
     );
@@ -50,6 +50,42 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ size, color, focused }) => (
+            <Icon
+              name={focused ? "search" : "search-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="wishlist"
+        listeners={{
+          tabPress: (e) => {
+            if (customer?.authType !== AuthTypes.REGISTERED) {
+              e.preventDefault();
+              router.push("/login");
+            }
+          },
+        }}
+        options={{
+          title: "Wislist",
+          tabBarIcon: ({ size, color, focused }) => (
+            <Icon
+              name={focused ? "heart" : "heart-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="cart"
         options={{
           title: "Cart",
@@ -61,20 +97,6 @@ export default function TabsLayout() {
             />
           ),
           tabBarBadge: basket?.productItems?.length || undefined,
-        }}
-      />
-
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Search",
-          tabBarIcon: ({ size, color, focused }) => (
-            <Icon
-              name={focused ? "search" : "search-outline"}
-              size={size}
-              color={color}
-            />
-          ),
         }}
       />
 
