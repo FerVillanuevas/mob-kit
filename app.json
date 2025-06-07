@@ -9,11 +9,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "appleTeamId": "AAAA",
+      "appleTeamId": "aaaaaaaaaaaa",
       "supportsTablet": false,
       "bundleIdentifier": "com.fervillanuevas.mob-kit",
       "entitlements": {
         "com.apple.security.application-groups": ["group.fervillanuevas.data"]
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -44,7 +47,31 @@
       "expo-web-browser"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "bundleIdentifier": "com.fervillanuevas.mob-kit.widget",
+                  "targetName": "widget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.fervillanuevas.data"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "aaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
     }
   }
 }
