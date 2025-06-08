@@ -1,11 +1,15 @@
 import currency from "currency.js";
 import { useState } from "react";
-import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
+import {
+  GestureResponderEvent,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+} from "react-native";
 import Icon from "~/components/icon";
 import Image from "~/components/image";
 import { Button } from "~/components/ui/button";
-import { Text } from "~/components/ui/text";
-import { H4 } from "~/components/ui/typography";
+import { H4, Muted } from "~/components/ui/typography";
 import { normalizeProduct, ProductLike } from "~/lib/commerce";
 import { cn } from "~/lib/utils";
 
@@ -27,17 +31,14 @@ export default function ProductHit({
   ...rest
 }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(isFavorite);
-  const [imageError, setImageError] = useState(false);
 
   // Normalize the product data
   const normalizedProduct = normalizeProduct(product);
 
   // Get the primary image with fallback
-  const primaryImage = !imageError ? normalizedProduct.image : null;
-  const imageAlt =
-    normalizedProduct.imageAlt || normalizedProduct.name || "Product image";
+  const primaryImage = normalizedProduct.image;
 
-  const handleWishlistToggle = (e: React.MouseEvent) => {
+  const handleWishlistToggle = (e: GestureResponderEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -58,7 +59,11 @@ export default function ProductHit({
         )}
 
         {showWishList && (
-          <Button size="icon" className="absolute right-4 top-4">
+          <Button
+            size="icon"
+            onPress={handleWishlistToggle}
+            className="absolute right-4 top-4"
+          >
             <Icon
               name={isWishlisted ? "heart" : "heart-outline"}
               className="text-destructive"
@@ -68,12 +73,12 @@ export default function ProductHit({
       </View>
 
       <View className="w-full">
-        <H4 numberOfLines={1} className="flex-1 font-semibold">
+        <H4 numberOfLines={1} className="font-semibold">
           {normalizedProduct.name}
         </H4>
-        <Text numberOfLines={1}>
+        <Muted numberOfLines={1}>
           {currency(normalizedProduct.price || 0).format()}
-        </Text>
+        </Muted>
       </View>
     </TouchableOpacity>
   );

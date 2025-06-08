@@ -3,13 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { ShopperProductsTypes } from "commerce-sdk-isomorphic";
 import currency from "currency.js";
 import { router } from "expo-router";
+import { debounce } from "lodash";
 import { useState } from "react";
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import AvoidingBlur from "~/components/avoiding-blur";
 import Icon from "~/components/icon";
 import Image from "~/components/image";
 import { Input } from "~/components/ui/input";
-import { H4, P } from "~/components/ui/typography";
+import { H1, H4, Muted, P } from "~/components/ui/typography";
 import { getProductsByIdsQueryOptions } from "~/integrations/salesforce/options/products";
 import { getSearchSuggestionsOptions } from "~/integrations/salesforce/options/search";
 import { normalizeProduct } from "~/lib/commerce";
@@ -27,7 +28,10 @@ const SearchResult = ({
   return (
     <TouchableOpacity
       {...rest}
-      className={cn("flex flex-row items-center justify-between mb-4", className)}
+      className={cn(
+        "mb-4 flex flex-row items-center justify-between",
+        className,
+      )}
     >
       <View className="flex flex-row items-center gap-3">
         <Image
@@ -63,12 +67,24 @@ export default function SearchPage() {
     getProductsByIdsQueryOptions({ ids: productIds }),
   );
 
+  const handleChangeText = debounce((q) => {
+    setSearchQuery(q);
+  }, 300);
+
   const products = productsResult?.data || [];
 
   return (
     <View className="flex flex-1 p-4">
       <FlashList
         data={data?.productSuggestions?.products}
+        estimatedItemSize={100}
+        ListEmptyComponent={
+          <View className="flex flex-1 items-center justify-center gap-4 py-32">
+            <Icon name="search-outline" size={64} />
+            <H1>No results found</H1>
+            <Muted>Try something similar</Muted>
+          </View>
+        }
         renderItem={({ item }) => {
           const product = products.find((p) => p.id === item.productId);
 
@@ -93,7 +109,7 @@ export default function SearchPage() {
       />
 
       <AvoidingBlur bottom={0} style={{ paddingBottom: 8 }}>
-        <Input onChangeText={setSearchQuery} />
+        <Input placeholder="Search" onChangeText={handleChangeText} />
       </AvoidingBlur>
     </View>
   );

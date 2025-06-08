@@ -17,11 +17,11 @@ struct Rec: Codable, Identifiable {
 // MARK: - Timeline Provider
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), recommendation: sampleRecommendations().first, image: UIImage(named: "placeholder"))
+        SimpleEntry(date: Date(), recommendation: nil, image: nil)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), recommendation: sampleRecommendations().first, image: UIImage(named: "placeholder"))
+        let entry = SimpleEntry(date: Date(), recommendation: nil, image: nil)
         completion(entry)
     }
 
@@ -53,9 +53,9 @@ struct Provider: TimelineProvider {
                 }
             }
             
-            // If no entries were created, create a placeholder timeline
+            // If no entries were created, show no recommendations state
             if entries.isEmpty {
-                let entry = SimpleEntry(date: Date(), recommendation: recommendations.first, image: UIImage(named: "placeholder"))
+                let entry = SimpleEntry(date: Date(), recommendation: nil, image: nil)
                 entries.append(entry)
             }
 
@@ -80,7 +80,7 @@ struct Provider: TimelineProvider {
         let defaults = UserDefaults(suiteName: "group.fervillanuevas.data")
         guard let jsonString = defaults?.string(forKey: "recommendations"),
               let jsonData = jsonString.data(using: .utf8) else {
-            return sampleRecommendations()
+            return [] // Return empty array instead of sample data
         }
         
         do {
@@ -88,16 +88,8 @@ struct Provider: TimelineProvider {
             return response.recs
         } catch {
             print("Error decoding recommendations: \(error)")
-            return sampleRecommendations()
+            return [] // Return empty array instead of sample data
         }
-    }
-    
-    private func sampleRecommendations() -> [Rec] {
-        return [
-            Rec(id: "1", image_url: "", product_name: "Sample Product 1", product_url: ""),
-            Rec(id: "2", image_url: "", product_name: "Sample Product 2", product_url: ""),
-            Rec(id: "3", image_url: "", product_name: "Sample Product 3", product_url: "")
-        ]
     }
 }
 
@@ -140,57 +132,73 @@ struct SmallWidgetView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .bottom) {
-                // Full-size image background
+            ZStack(alignment: .center) {
                 if let image = entry.image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                } else {
-                    Color.gray.opacity(0.3)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .foregroundColor(.gray)
+                    // Product recommendation with image
+                    ZStack(alignment: .bottom) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .clipped()
+                        
+                        LinearGradient(
+                            gradient: Gradient(colors: [.black.opacity(0.7), .clear]),
+                            startPoint: .bottom,
+                            endPoint: .top
                         )
-                }
-                
-                // Gradient overlay for text visibility
-                LinearGradient(
-                    gradient: Gradient(colors: [.black.opacity(0.7), .clear]),
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-                .frame(height: 60)
-                
-                // Text overlay
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
-                            .font(.system(size: 10))
-                        Text("Recommended")
-                            .font(.system(size: 10))
+                        .frame(height: 60)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.yellow)
+                                    .font(.system(size: 10))
+                                Text("Recommended")
+                                    .font(.system(size: 10))
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                Spacer()
+                            }
+                            
+                            if let rec = entry.recommendation {
+                                Text(rec.product_name)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .lineLimit(2)
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .padding(8)
+                    }
+                } else {
+                    // No recommendations state
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.blue.opacity(0.6),
+                            Color.purple.opacity(0.6)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    
+                    VStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                        
+                        Text("No Recommendations")
+                            .font(.caption)
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
-                        Spacer()
-                    }
-                    
-                    if let rec = entry.recommendation {
-                        Text(rec.product_name)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .lineLimit(2)
-                            .foregroundColor(.white)
-                    } else {
-                        Text("No recommendations available")
-                            .font(.caption)
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Check back later")
+                            .font(.system(size: 10))
                             .foregroundColor(.white.opacity(0.8))
                     }
                 }
-                .padding(8)
             }
         }
     }
@@ -202,56 +210,75 @@ struct MediumWidgetView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .bottomLeading) {
-                // Full-size image background
                 if let image = entry.image {
+                    // Product recommendation with image
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipped()
-                } else {
-                    Color.gray.opacity(0.3)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .foregroundColor(.gray)
-                        )
-                }
-                
-                // Gradient overlay for text visibility
-                LinearGradient(
-                    gradient: Gradient(colors: [.black.opacity(0.8), .black.opacity(0.3), .clear]),
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-                .frame(height: 80)
-                
-                // Text overlay with proper title
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
-                            .font(.system(size: 12))
-                        Text("Recommended For You")
-                            .font(.system(size: 12))
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                        Spacer()
-                    }
                     
-                    if let rec = entry.recommendation {
-                        Text(rec.product_name)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .lineLimit(2)
-                            .foregroundColor(.white)
-                    } else {
-                        Text("No recommendations available")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.8))
+                    LinearGradient(
+                        gradient: Gradient(colors: [.black.opacity(0.8), .black.opacity(0.3), .clear]),
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                    .frame(height: 80)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                                .font(.system(size: 12))
+                            Text("Recommended For You")
+                                .font(.system(size: 12))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                            Spacer()
+                        }
+                        
+                        if let rec = entry.recommendation {
+                            Text(rec.product_name)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .lineLimit(2)
+                                .foregroundColor(.white)
+                        }
                     }
+                    .padding(12)
+                } else {
+                    // No recommendations state
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.blue.opacity(0.6),
+                            Color.purple.opacity(0.6),
+                            Color.pink.opacity(0.6)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    
+                    VStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                        
+                        VStack(spacing: 4) {
+                            Text("No Recommendations")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Text("We're working on finding perfect products for you")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                        }
+                    }
+                    .padding()
                 }
-                .padding(12)
             }
         }
     }
@@ -263,76 +290,110 @@ struct LargeWidgetView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Full-size image background
                 if let image = entry.image {
+                    // Product recommendation with image
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipped()
-                } else {
-                    Color.gray.opacity(0.3)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .foregroundColor(.gray)
-                        )
-                }
-                
-                // Gradient overlay for text visibility
-                LinearGradient(
-                    gradient: Gradient(colors: [.black.opacity(0.8), .black.opacity(0.4), .clear]),
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-                
-                // Content overlay
-                VStack(alignment: .leading, spacing: 6) {
-                    Spacer()
                     
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
-                        Text("Recommended For You")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
+                    LinearGradient(
+                        gradient: Gradient(colors: [.black.opacity(0.8), .black.opacity(0.4), .clear]),
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                    
+                    VStack(alignment: .leading, spacing: 6) {
                         Spacer()
-                    }
-                    
-                    if let rec = entry.recommendation {
-                        Text(rec.product_name)
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .lineLimit(2)
-                            .foregroundColor(.white)
-                            .padding(.top, 2)
                         
-                        // Add a "View Details" button-like element
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                            Text("Recommended For You")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            Spacer()
+                        }
+                        
+                        if let rec = entry.recommendation {
+                            Text(rec.product_name)
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                                .lineLimit(2)
+                                .foregroundColor(.white)
+                                .padding(.top, 2)
+                            
+                            HStack {
+                                Text("View Details")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.white)
+                                
+                                Image(systemName: "arrow.right")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(Color.white.opacity(0.3))
+                            .cornerRadius(12)
+                            .padding(.top, 4)
+                        }
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                } else {
+                    // No recommendations state
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.blue.opacity(0.7),
+                            Color.purple.opacity(0.7),
+                            Color.pink.opacity(0.7),
+                            Color.orange.opacity(0.7)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    
+                    VStack(spacing: 12) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 48))
+                            .foregroundColor(.white)
+                        
+                        VStack(spacing: 6) {
+                            Text("No Recommendations")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Text("We're analyzing your preferences to find the perfect products for you")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                                .lineLimit(3)
+                                .padding(.horizontal)
+                        }
+                        
                         HStack {
-                            Text("View Details")
+                            Text("Check Back Soon")
                                 .font(.caption)
                                 .fontWeight(.medium)
                                 .foregroundColor(.white)
                             
-                            Image(systemName: "arrow.right")
+                            Image(systemName: "arrow.clockwise")
                                 .font(.caption)
                                 .foregroundColor(.white)
                         }
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 12)
                         .background(Color.white.opacity(0.3))
-                        .cornerRadius(12)
-                        .padding(.top, 4)
-                        
-                    } else {
-                        Text("No recommendations available")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.8))
+                        .cornerRadius(16)
                     }
+                    .padding()
                 }
-                .padding(12)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             }
         }
     }
@@ -358,20 +419,20 @@ struct widget: Widget {
 #Preview(as: .systemSmall) {
     widget()
 } timeline: {
+    SimpleEntry(date: Date(), recommendation: nil, image: nil)
     SimpleEntry(date: Date(), recommendation: Rec(id: "1", image_url: "", product_name: "Summer Bomber Jacket", product_url: ""), image: UIImage(systemName: "photo"))
-    SimpleEntry(date: Date(), recommendation: Rec(id: "2", image_url: "", product_name: "Smart Watch", product_url: ""), image: UIImage(systemName: "photo"))
 }
 
 #Preview(as: .systemMedium) {
     widget()
 } timeline: {
+    SimpleEntry(date: Date(), recommendation: nil, image: nil)
     SimpleEntry(date: Date(), recommendation: Rec(id: "1", image_url: "", product_name: "Summer Bomber Jacket", product_url: ""), image: UIImage(systemName: "photo"))
-    SimpleEntry(date: Date(), recommendation: Rec(id: "2", image_url: "", product_name: "Smart Watch", product_url: ""), image: UIImage(systemName: "photo"))
 }
 
 #Preview(as: .systemLarge) {
     widget()
 } timeline: {
+    SimpleEntry(date: Date(), recommendation: nil, image: nil)
     SimpleEntry(date: Date(), recommendation: Rec(id: "1", image_url: "", product_name: "Summer Bomber Jacket", product_url: ""), image: UIImage(systemName: "photo"))
-    SimpleEntry(date: Date(), recommendation: Rec(id: "2", image_url: "", product_name: "Smart Watch", product_url: ""), image: UIImage(systemName: "photo"))
 }

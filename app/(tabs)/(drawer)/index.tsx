@@ -2,11 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { ScrollView, View } from "react-native";
 import HorizontalProducts from "~/components/commerce/horizontal-products";
 import Icon from "~/components/icon";
-import { H3 } from "~/components/ui/typography";
+import { H1, H3 } from "~/components/ui/typography";
 import getProductRecsQueryOptions from "~/integrations/salesforce/options/einstein";
 
 import { ExtensionStorage } from "@bacons/apple-targets";
+import { DrawerActions } from "@react-navigation/native";
+import { router, useNavigation } from "expo-router";
 import { useEffect } from "react";
+import { Button } from "~/components/ui/button";
+import { Text } from "~/components/ui/text";
+import useRootCategories from "~/hooks/use-root-categories";
 
 // Create a storage object with the App Group.
 const storage = new ExtensionStorage(
@@ -15,6 +20,10 @@ const storage = new ExtensionStorage(
 );
 
 export default function Index() {
+  const navigation = useNavigation();
+
+  const { data: categories } = useRootCategories();
+
   const { data } = useQuery(
     getProductRecsQueryOptions({
       recId: "viewed-recently-einstein",
@@ -36,7 +45,44 @@ export default function Index() {
         </H3>
       </View>
 
-      <View className="gap-4 px-4 py-8">
+      <View className="gap-6 px-4 py-8">
+        <View className="gap-3">
+          <View className="flex flex-row items-center justify-between">
+            <H1>Discover</H1>
+
+            <Button
+              variant="link"
+              onPress={() => {
+                navigation.dispatch(DrawerActions.toggleDrawer());
+              }}
+            >
+              <Text className="text-destructive">View all</Text>
+            </Button>
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View className="flex flex-row gap-3">
+              {categories?.categories?.map((category) => {
+                return (
+                  <Button
+                    key={category.id}
+                    onPress={() => {
+                      router.push({
+                        pathname: "/category/[id]",
+                        params: {
+                          id: category.id,
+                        },
+                      });
+                    }}
+                  >
+                    <Text>{category.name}</Text>
+                  </Button>
+                );
+              })}
+            </View>
+          </ScrollView>
+        </View>
+
         <HorizontalProducts category="newarrivals" title="New Arrivals" />
 
         <HorizontalProducts

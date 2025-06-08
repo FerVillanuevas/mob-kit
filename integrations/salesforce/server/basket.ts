@@ -1,5 +1,12 @@
 import { getSalesforceAPI } from "~/integrations/salesforce/server/config";
-import { AddItemToBasketParams, AddPaymentInstrumentToBasketParams, UpdateBillingAddressForBasketParams, UpdateShippingAddressForShipmentParams, UpdateShippingMethodForShipmentParams, UpdateShippingMethodParams } from "~/integrations/salesforce/types/params";
+import {
+  AddItemToBasketParams,
+  AddPaymentInstrumentToBasketParams,
+  UpdateBillingAddressForBasketParams,
+  UpdateShippingAddressForShipmentParams,
+  UpdateShippingMethodForShipmentParams,
+  UpdateShippingMethodParams,
+} from "~/integrations/salesforce/types/params";
 
 export const addItemToNewOrExistingBasket = async ({
   data,
@@ -30,6 +37,7 @@ export const addItemToNewOrExistingBasket = async ({
       const newBasket = await shopperBasket.createBasket({
         body: {},
       });
+
       basketId = newBasket.basketId;
     }
 
@@ -78,7 +86,11 @@ export const updateCustomerForBasket = async ({
   });
 };
 
-export const deleteBasket = async ({ data }: {data: { basketId: string }}) => {
+export const deleteBasket = async ({
+  data,
+}: {
+  data: { basketId: string };
+}) => {
   const { api } = await getSalesforceAPI();
   const shopperBasket = await api.shopperBaskets();
 
@@ -123,7 +135,11 @@ export const getBasket = async () => {
   });
 };
 
-export const updateShippingMethod = async ({ data }: {data: UpdateShippingMethodParams}) => {
+export const updateShippingMethod = async ({
+  data,
+}: {
+  data: UpdateShippingMethodParams;
+}) => {
   const { api } = await getSalesforceAPI();
   const shopperBasket = await api.shopperBaskets();
 
@@ -133,7 +149,11 @@ export const updateShippingMethod = async ({ data }: {data: UpdateShippingMethod
   });
 };
 
-export const updateShippingMethodForShipment = async ({ data }: {data: UpdateShippingMethodForShipmentParams}) => {
+export const updateShippingMethodForShipment = async ({
+  data,
+}: {
+  data: UpdateShippingMethodForShipmentParams;
+}) => {
   const { api } = await getSalesforceAPI();
   const shopperBasket = await api.shopperBaskets();
 
@@ -143,7 +163,11 @@ export const updateShippingMethodForShipment = async ({ data }: {data: UpdateShi
   });
 };
 
-export const updateShippingAddressForShipment = async ({ data }: {data: UpdateShippingAddressForShipmentParams}) => {
+export const updateShippingAddressForShipment = async ({
+  data,
+}: {
+  data: UpdateShippingAddressForShipmentParams;
+}) => {
   const { api } = await getSalesforceAPI();
   const shopperBasket = await api.shopperBaskets();
 
@@ -152,7 +176,12 @@ export const updateShippingAddressForShipment = async ({ data }: {data: UpdateSh
     body: data.body,
   });
 };
-export const updateBillingAddressForBasket = async ({ data }: {data: UpdateBillingAddressForBasketParams}) => {
+
+export const updateBillingAddressForBasket = async ({
+  data,
+}: {
+  data: UpdateBillingAddressForBasketParams;
+}) => {
   const { api } = await getSalesforceAPI();
   const shopperBasket = await api.shopperBaskets();
 
@@ -161,6 +190,7 @@ export const updateBillingAddressForBasket = async ({ data }: {data: UpdateBilli
     body: data.body,
   });
 };
+
 export const getShippingMethodsForShipment = async ({ data }: any) => {
   const { api } = await getSalesforceAPI();
   const shopperBasket = await api.shopperBaskets();
@@ -172,12 +202,41 @@ export const getShippingMethodsForShipment = async ({ data }: any) => {
     },
   });
 };
-export const addPaymentInstrumentToBasket = async ({ data }: {data: AddPaymentInstrumentToBasketParams}) => {
+
+export const addPaymentInstrumentToBasket = async ({
+  data,
+}: {
+  data: AddPaymentInstrumentToBasketParams;
+}) => {
   const { api } = await getSalesforceAPI();
   const shopperBasket = await api.shopperBaskets();
 
   return await shopperBasket.addPaymentInstrumentToBasket({
     body: data.body,
     parameters: data.params,
+  });
+};
+
+export const updateItemInBasket = async ({
+  data,
+}: {
+  data: {
+    basketId: string;
+    itemId: string;
+    quantity: number;
+  };
+}) => {
+  const { api } = await getSalesforceAPI();
+
+  const shopperBaskets = await api.shopperBaskets();
+
+  return await shopperBaskets.updateItemInBasket({
+    parameters: {
+      basketId: data.basketId,
+      itemId: data.itemId,
+    },
+    body: {
+      quantity: data.quantity,
+    },
   });
 };

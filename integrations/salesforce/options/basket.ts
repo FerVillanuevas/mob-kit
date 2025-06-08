@@ -7,6 +7,7 @@ import {
   mergeBasket,
   updateBillingAddressForBasket,
   updateCustomerForBasket,
+  updateItemInBasket,
   updateShippingAddressForShipment,
   updateShippingMethod,
   updateShippingMethodForShipment,
@@ -133,5 +134,18 @@ export const getBasketQueryOptions = () => {
   return queryOptions({
     queryKey: ["basket"],
     queryFn: async () => getBasket(),
+  });
+};
+
+export const useUpdateItemInBasketMutation = () => {
+  return useMutation({
+    mutationFn: async (data: {
+      basketId: string;
+      itemId: string;
+      quantity: number;
+    }) => updateItemInBasket({ data }),
+    meta: {
+      invalidateQuery: getBasketQueryOptions().queryKey,
+    },
   });
 };

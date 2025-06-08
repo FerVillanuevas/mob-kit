@@ -3,18 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { ShopperCustomersTypes } from "commerce-sdk-isomorphic";
 import { Redirect } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { ScrollView, View } from "react-native";
-import { Button } from "~/components/ui/button";
+import { TouchableOpacity, View } from "react-native";
+import Icon from "~/components/icon";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
+import { H1, Muted } from "~/components/ui/typography";
 import { useSalesforceAuth } from "~/hooks/use-salesforce-auth";
 import { AuthTypes } from "~/integrations/salesforce/enums";
 import { getCustomerQueryOptions } from "~/integrations/salesforce/options/customer";
@@ -166,14 +168,62 @@ export default function CustomerPage() {
   }
 
   return (
-    <ScrollView>
-      <CustomerForm customer={customer} />
-
-      <View className="p-4">
-        <Button variant="destructive" onPress={handleLogOut}>
-          <Text>Logout</Text>
-        </Button>
+    <View className="flex flex-1">
+      <View className="p-4 gap-2">
+        <H1 numberOfLines={1}>{customer.firstName} {customer.lastName}</H1>
+        <Muted>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</Muted>
       </View>
-    </ScrollView>
+
+      <Separator className="h-1" />
+
+      <View className="flex flex-1 flex-col">
+        <TouchableOpacity
+          onPress={() => {}}
+          className="border-b border-border px-4 py-8"
+        >
+          <View className="flex flex-row items-center gap-4">
+            <Icon name="basket" size={22} />
+            <Text>My orders</Text>
+          </View>
+        </TouchableOpacity>
+
+        <Separator className="h-1" />
+
+        <TouchableOpacity
+          onPress={() => {}}
+          className="border-b border-border px-4 py-8"
+        >
+          <View className="flex flex-row items-center gap-4">
+            <Icon name="people" size={22} />
+            <Text>Account details</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {}}
+          className="border-b border-border px-4 py-8"
+        >
+          <View className="flex flex-row items-center gap-4">
+            <Icon name="home" size={22} />
+            <Text>Address</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {}}
+          className="border-b border-border px-4 py-8"
+        >
+          <View className="flex flex-row items-center gap-4">
+            <Icon name="card" size={22} />
+            <Text>Payments</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity onPress={handleLogOut} className="px-4 py-8">
+        <View className="flex flex-row items-center gap-4">
+          <Icon name="exit" size={22} className="text-destructive" />
+          <Text className="text-destructive">Log out</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 }

@@ -178,6 +178,8 @@ export default function CategoryPage() {
   const productData = products;
   const isInitialLoading = isLoading && !productData;
 
+  const handleAddToWishlist = () => {};
+
   return (
     <StyledDrawer
       open={open}
@@ -279,6 +281,7 @@ export default function CategoryPage() {
         renderItem={({ item }) => {
           return (
             <ProductHit
+              showWishList
               onPress={() => {
                 router.push({
                   pathname: "/product/[id]",
@@ -287,6 +290,7 @@ export default function CategoryPage() {
                   },
                 });
               }}
+              onWishListToggle={handleAddToWishlist}
               product={item}
               className="w-full p-4"
             />

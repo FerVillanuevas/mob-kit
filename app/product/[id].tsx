@@ -13,6 +13,7 @@ import {
 import Carousel from "~/components/carousel";
 import ProductRecomendations from "~/components/commerce/product-recomandations";
 import { ProductVariations } from "~/components/commerce/product-variations";
+import { QuantitySelector } from "~/components/commerce/quantity-selector";
 import Icon from "~/components/icon";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -361,6 +362,56 @@ export default function ProductPage() {
                 onVariationChange={handleVariationChange}
               />
             )}
+
+          {/* Quantity Selector */}
+          <View className="gap-3">
+            <View className="flex-row items-center justify-between">
+              <H3>Quantity</H3>
+              <Badge
+                className={cn(
+                  stockStatus.color === "green" &&
+                    "border-green-200 bg-green-50",
+                  stockStatus.color === "orange" &&
+                    "border-orange-200 bg-orange-50",
+                  stockStatus.color === "red" && "border-red-200 bg-red-50",
+                )}
+              >
+                <View className="flex-row items-center gap-1">
+                  <Icon
+                    name={
+                      stockStatus.color === "green"
+                        ? "checkmark-circle"
+                        : "alert-circle"
+                    }
+                    className={cn(
+                      stockStatus.color === "green" && "text-green-600",
+                      stockStatus.color === "orange" && "text-orange-600",
+                      stockStatus.color === "red" && "text-red-600",
+                    )}
+                    size={12}
+                  />
+                  <Text
+                    className={cn(
+                      "text-xs",
+                      stockStatus.color === "green" && "text-green-800",
+                      stockStatus.color === "orange" && "text-orange-800",
+                      stockStatus.color === "red" && "text-red-800",
+                    )}
+                  >
+                    {stockStatus.text}
+                  </Text>
+                </View>
+              </Badge>
+            </View>
+
+            <QuantitySelector
+              value={quantity}
+              onValueChange={setQuantity}
+              min={minOrderQuantity}
+              max={stockLevel || 999}
+              disabled={!isInStock}
+            />
+          </View>
 
           {product.longDescription ? (
             <Text className="text-sm leading-relaxed">
