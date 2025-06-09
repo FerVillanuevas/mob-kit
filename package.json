@@ -42,7 +42,7 @@
     "commerce-sdk-isomorphic": "^3.3.0",
     "currency.js": "^2.0.4",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
-    "expo": "53",
+    "expo": "53.0.11",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
     "expo-crypto": "~14.1.5",
