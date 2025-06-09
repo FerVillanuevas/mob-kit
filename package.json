@@ -28,6 +28,7 @@
     "@react-navigation/material-top-tabs": "^7.2.14",
     "@react-navigation/native": "^7.0.14",
     "@rn-primitives/checkbox": "^1.2.0",
+    "@rn-primitives/collapsible": "^1.2.0",
     "@rn-primitives/label": "^1.2.0",
     "@rn-primitives/separator": "^1.2.0",
     "@rn-primitives/slot": "^1.2.0",

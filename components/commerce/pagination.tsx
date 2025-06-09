@@ -2,6 +2,7 @@ import { TouchableOpacity, View } from "react-native"
 import Icon from "~/components/icon"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Text } from "~/components/ui/text"
+import { PLPSearchParams } from "~/lib/commerce/url-params"
 import { cn } from "~/lib/utils"
 
 export function PaginationSkeleton() {
@@ -46,7 +47,7 @@ export function Pagination({
   requestedLimit: number
   total: number
   offset: number
-  navigate: any
+  navigate: (updateFn: (prev: PLPSearchParams) => PLPSearchParams) => void
   isLoading?: boolean
 }) {
   const limit = requestedLimit
@@ -61,18 +62,18 @@ export function Pagination({
 
   const goToPage = (page: number) => {
     const newOffset = (page - 1) * limit
-    navigate((prev: any) => ({ ...prev, offset: newOffset }))
+    navigate((prev) => ({ ...prev, offset: newOffset }))
   }
 
   const nextPage = () => {
     if (hasNext) {
-      navigate((prev: any) => ({ ...prev, offset: offset + limit }))
+      navigate((prev) => ({ ...prev, offset: offset + limit }))
     }
   }
 
   const prevPage = () => {
     if (hasPrev) {
-      navigate((prev: any) => ({ ...prev, offset: Math.max(0, offset - limit) }))
+      navigate((prev) => ({ ...prev, offset: Math.max(0, offset - limit) }))
     }
   }
 

@@ -35,7 +35,8 @@ const FiltersContent = ({
 
   // Helper function to check if a value is selected for a specific attribute
   const isValueSelected = (attributeId: string, value: string): boolean => {
-    return selectedRefinements[attributeId]?.includes(value) || false
+    if (!selectedRefinements[attributeId]) return false
+    return selectedRefinements[attributeId].includes(value)
   }
 
   // Helper function to handle filter removal from active filters
@@ -216,7 +217,6 @@ const FiltersContent = ({
                 >
                   <View className="gap-3">
                     {refinement.values?.map((val, i) => {
-                      // Explicitly check if this value is selected
                       const isSelected = isValueSelected(refinement.attributeId, val.value)
 
                       return (

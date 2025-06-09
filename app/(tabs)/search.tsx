@@ -13,7 +13,7 @@ import { Input } from "~/components/ui/input";
 import { H1, H4, Muted, P } from "~/components/ui/typography";
 import { getProductsByIdsQueryOptions } from "~/integrations/salesforce/options/products";
 import { getSearchSuggestionsOptions } from "~/integrations/salesforce/options/search";
-import { normalizeProduct } from "~/lib/commerce";
+import { normalizeProduct } from "~/lib/commerce/utils";
 import { cn } from "~/lib/utils";
 
 const SearchResult = ({

@@ -1,4 +1,7 @@
-import { ShopperProductsTypes, ShopperSearchTypes } from "commerce-sdk-isomorphic";
+import {
+  ShopperProductsTypes,
+  ShopperSearchTypes,
+} from "commerce-sdk-isomorphic";
 
 // Union type for both product types
 export type ProductLike =

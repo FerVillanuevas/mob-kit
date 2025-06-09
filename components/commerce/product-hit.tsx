@@ -10,7 +10,7 @@ import Icon from "~/components/icon";
 import Image from "~/components/image";
 import { Button } from "~/components/ui/button";
 import { H4, Muted } from "~/components/ui/typography";
-import { normalizeProduct, ProductLike } from "~/lib/commerce";
+import { normalizeProduct, ProductLike } from "~/lib/commerce/utils";
 import { cn } from "~/lib/utils";
 
 interface ProductCardProps extends TouchableOpacityProps {

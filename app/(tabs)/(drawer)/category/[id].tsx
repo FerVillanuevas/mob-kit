@@ -1,79 +1,56 @@
-import { FlashList } from "@shopify/flash-list";
-import { useQuery } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
-import { cssInterop } from "nativewind";
-import { useState } from "react";
-import { ScrollView, View } from "react-native";
-import { Drawer } from "react-native-drawer-layout";
-import FiltersContent from "~/components/commerce/filter-content";
-import { HeaderSkeleton } from "~/components/commerce/header-skeleton";
-import { Pagination } from "~/components/commerce/pagination";
-import ProductHit from "~/components/commerce/product-hit";
-import { ProductGridSkeleton } from "~/components/commerce/product-skeleton";
-import Icon from "~/components/icon";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { Skeleton } from "~/components/ui/skeleton";
-import { Text } from "~/components/ui/text";
-import { H1, H4 } from "~/components/ui/typography";
-import { getProductsQueryOptions } from "~/integrations/salesforce/options/products";
-import { REQUESTED_LIMIT } from "~/lib/constants";
+"use client"
+
+import { FlashList } from "@shopify/flash-list"
+import { useQuery } from "@tanstack/react-query"
+import { router, useLocalSearchParams } from "expo-router"
+import { cssInterop } from "nativewind"
+import { useState } from "react"
+import { ScrollView, View } from "react-native"
+import { Drawer } from "react-native-drawer-layout"
+import FiltersContent from "~/components/commerce/filter-content"
+import { HeaderSkeleton } from "~/components/commerce/header-skeleton"
+import { Pagination } from "~/components/commerce/pagination"
+import ProductHit from "~/components/commerce/product-hit"
+import { ProductGridSkeleton } from "~/components/commerce/product-skeleton"
+import Icon from "~/components/icon"
+import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
+import { Skeleton } from "~/components/ui/skeleton"
+import { Text } from "~/components/ui/text"
+import { H1, H4 } from "~/components/ui/typography"
+import { getProductsQueryOptions } from "~/integrations/salesforce/options/products"
+import {
+  buildRefineArray,
+  debugUrlParams,
+  parseUrlParams,
+  serializeSearchParams,
+  type PLPSearchParams,
+} from "~/lib/commerce/url-params"
+import { REQUESTED_LIMIT } from "~/lib/constants"
 
 const StyledDrawer = cssInterop(Drawer, {
   className: "drawerStyle",
-});
-
-// Helper function to parse search params into the expected structure
-const parseSearchParams = (params: Record<string, string | string[]>) => {
-  const offset = Number(params.offset) || 0;
-  const sort = params.sort as string | undefined;
-  const refinements: Record<string, string[]> = {};
-
-  // Extract refinements from params (everything except id, offset, sort)
-  Object.entries(params).forEach(([key, value]) => {
-    if (key !== "id" && key !== "offset" && key !== "sort") {
-      if (Array.isArray(value)) {
-        refinements[key] = value;
-      } else if (typeof value === "string") {
-        // Handle comma-separated values from Expo Router
-        // Split by comma and filter out empty strings
-        const values = value.split(",").filter((v) => v.trim() !== "");
-        if (values.length > 0) {
-          refinements[key] = values;
-        }
-      }
-    }
-  });
-
-  return { offset, sort, refinements };
-};
+})
 
 export default function CategoryPage() {
-  const params = useLocalSearchParams<{
-    id: string;
-    sort?: string;
-    refinements?: string;
-  }>();
-  const categoryId = params.id as string;
+  const params = useLocalSearchParams()
+  const categoryId = params.id as string
 
-  // Parse search params exactly like web version
-  const {
-    offset = 0,
-    sort = "best-matches",
-    refinements = {},
-  } = parseSearchParams(params);
+  // Debug logging in development
+  if (process.env.NODE_ENV === "development") {
+    debugUrlParams(params, "mobile")
+  }
 
-  const [open, setOpen] = useState(false);
+  // Parse URL parameters using shared utility (standardized on web format)
+  const { offset = 0, sort = "best-matches", refinements = {} } = parseUrlParams(params)
 
-  // Build refine array for API - exactly like web version
-  const refineArray = [`cgid=${categoryId}`];
-  Object.entries(refinements).forEach(([attributeId, values]) => {
-    if (values.length > 0) {
-      // Join multiple values with pipe separator instead of creating separate entries
-      const joinedValues = values.join("|");
-      refineArray.push(`${attributeId}=${joinedValues}`);
-    }
-  });
+
+  console.log(offset);
+
+  const [open, setOpen] = useState(false)
+
+  // Build refine array for API using shared utility
+  const refineArray = buildRefineArray(categoryId, refinements)
 
   const {
     data: products,
@@ -87,98 +64,73 @@ export default function CategoryPage() {
       limit: REQUESTED_LIMIT,
       offset: offset,
     }),
-  );
+  )
 
-  const navigate = (updateFn: (prev: any) => any) => {
-    const currentSearch = { offset, sort, refinements };
-    const newSearch = updateFn(currentSearch);
+  const navigate = (updateFn: (prev: PLPSearchParams) => PLPSearchParams) => {
+    const currentSearch = { offset, sort, refinements }
+    const newSearch = updateFn(currentSearch)
 
-    // Build new params object
-    const newParams: Record<string, string | string[] | undefined> = {
-      id: categoryId,
-    };
+    // Serialize params for mobile using shared utility (standardized on web format)
+    const serializedParams = serializeSearchParams(newSearch, "mobile")
 
-    // Add offset if not 0
-    if (newSearch.offset && newSearch.offset !== 0) {
-      newParams.offset = newSearch.offset.toString();
-    }
-
-    // Add sort if exists and not default
-    if (newSearch.sort && newSearch.sort !== "best-matches") {
-      newParams.sort = newSearch.sort;
-    }
-
-    // Add refinements - convert arrays to comma-separated strings for Expo Router
-    if (
-      newSearch.refinements &&
-      Object.keys(newSearch.refinements).length > 0
-    ) {
-      Object.entries(newSearch.refinements).forEach(([key, values]) => {
-        //@ts-ignore
-        if (values.length > 0) {
-          // Join with commas for URL serialization
-          //@ts-ignore
-          newParams[key] = values.join(",");
-        }
-      });
+    // Debug logging for navigation
+    if (process.env.NODE_ENV === "development") {
+      console.log("[MOBILE] Navigating with params:", serializedParams)
     }
 
     router.replace({
       pathname: "/category/[id]",
-      //@ts-ignore
-      params: newParams,
-    });
-  };
+      params: {
+        id: categoryId,
+        ...serializedParams,
+      },
+    })
+  }
 
   const handleSelectedRefinement = (attributeId: string, value: string) => {
-    const currentValues = refinements[attributeId] || [];
+    const currentValues = refinements[attributeId] || []
     const newValues = currentValues.includes(value)
       ? currentValues.filter((v) => v !== value)
-      : [...currentValues, value];
+      : [...currentValues, value]
 
-    const newRefinements = { ...refinements };
+    const newRefinements = { ...refinements }
     if (newValues.length === 0) {
-      delete newRefinements[attributeId];
+      delete newRefinements[attributeId]
     } else {
-      newRefinements[attributeId] = newValues;
+      newRefinements[attributeId] = newValues
     }
 
     navigate((prev) => ({
       ...prev,
-      refinements:
-        Object.keys(newRefinements).length > 0 ? newRefinements : undefined,
+      refinements: Object.keys(newRefinements).length > 0 ? newRefinements : {},
       offset: 0, // Reset to first page when filtering
-    }));
-  };
+    }))
+  }
 
   const handleOnSortChange = (newSort: string) => {
     navigate((prev) => ({
       ...prev,
       sort: newSort,
       offset: 0, // Reset to first page when sorting
-    }));
-  };
+    }))
+  }
 
   const handleClearFilters = () => {
     navigate((prev) => ({
       ...prev,
-      refinements: undefined,
+      refinements: {},
       offset: 0,
-    }));
-    setOpen(false);
-  };
+    }))
+    setOpen(false)
+  }
 
-  // Calculate active filters count exactly like web
-  const activeFiltersCount = Object.values(refinements).reduce(
-    (acc, values) => acc + values.length,
-    0,
-  );
+  // Calculate active filters count
+  const activeFiltersCount = Object.values(refinements).reduce((acc, values) => acc + values.length, 0)
 
-  // Use the current products data even while loading new data
-  const productData = products;
-  const isInitialLoading = isLoading && !productData;
+  const productData = products
+  const isInitialLoading = isLoading && !productData
 
-  const handleAddToWishlist = () => {};
+  const handleAddToWishlist = () => {}
 
   return (
     <StyledDrawer
@@ -201,7 +153,7 @@ export default function CategoryPage() {
               isLoading={isLoading || isFetching}
             />
           </ScrollView>
-        );
+        )
       }}
     >
       <FlashList
@@ -213,32 +165,22 @@ export default function CategoryPage() {
                 <HeaderSkeleton />
                 <ProductGridSkeleton numColumns={2} numItems={6} />
               </View>
-            );
+            )
           }
 
           return (
             <View className="flex-1 items-center justify-center px-6 py-20">
-              <Icon
-                name="search"
-                size={48}
-                className="mb-6 text-muted-foreground"
-              />
-              <Text className="mb-2 text-center text-xl font-medium">
-                No products found
-              </Text>
+              <Icon name="search" size={48} className="mb-6 text-muted-foreground" />
+              <Text className="mb-2 text-center text-xl font-medium">No products found</Text>
               <Text className="mb-8 text-center text-muted-foreground">
                 Try adjusting your filters or search for something else
               </Text>
-              <Button
-                variant="outline"
-                onPress={handleClearFilters}
-                className="min-w-[180px]"
-              >
+              <Button variant="outline" onPress={handleClearFilters} className="min-w-[180px]">
                 <Icon name="refresh" size={16} className="mr-2" />
                 <Text>Clear Filters</Text>
               </Button>
             </View>
-          );
+          )
         }}
         ListHeaderComponent={() => {
           return (
@@ -247,9 +189,7 @@ export default function CategoryPage() {
                 <H1>Products</H1>
                 <View className="mt-1 flex-row items-center">
                   <H4 className="text-muted-foreground">
-                    {productData?.total
-                      ? `${productData.total} results`
-                      : "Loading results..."}
+                    {productData?.total ? `${productData.total} results` : "Loading results..."}
                   </H4>
                   {isFetching && !isInitialLoading && (
                     <View className="ml-2">
@@ -262,7 +202,7 @@ export default function CategoryPage() {
               <Button
                 size="sm"
                 onPress={() => {
-                  setOpen(true);
+                  setOpen(true)
                 }}
                 className="flex-row items-center gap-2 shadow-sm"
               >
@@ -274,7 +214,7 @@ export default function CategoryPage() {
                 <Text>Filters</Text>
               </Button>
             </View>
-          );
+          )
         }}
         numColumns={2}
         estimatedItemSize={315}
@@ -288,13 +228,13 @@ export default function CategoryPage() {
                   params: {
                     id: item.productId,
                   },
-                });
+                })
               }}
               onWishListToggle={handleAddToWishlist}
               product={item}
               className="w-full p-4"
             />
-          );
+          )
         }}
         ListFooterComponent={() => (
           <View className="px-4 py-6">
@@ -308,9 +248,9 @@ export default function CategoryPage() {
         )}
         refreshing={isFetching && !isInitialLoading}
         onRefresh={() => {
-          refetch();
+          refetch()
         }}
       />
     </StyledDrawer>
-  );
+  )
 }
