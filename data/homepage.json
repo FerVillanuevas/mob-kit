@@ -1,0 +1,259 @@
+{
+  "data": {},
+  "description": "Modern Fashion Homepage",
+  "id": "modern-homepage",
+  "name": "Modern Fashion Store",
+  "pageTitle": "Discover Your Style",
+  "pageDescription": "Premium fashion collection for the modern lifestyle",
+  "typeId": "storePage",
+  "regions": [
+    {
+      "id": "main",
+      "components": [
+        {
+          "id": "hero-banner-1",
+          "typeId": "modern_assets.heroBanner",
+          "name": "Hero Banner",
+          "data": {
+            "title": "Summer Collection 2024",
+            "subtitle": "Embrace the season with our latest arrivals",
+            "ctaText": "Shop Collection",
+            "ctaLink": "/summer-collection",
+            "backgroundImage": {
+              "url": "https://picsum.photos/400/800",
+              "alt": "Summer Collection Hero"
+            },
+            "overlayOpacity": 0.4,
+            "textPosition": "center"
+          }
+        },
+        {
+          "id": "category-showcase-1",
+          "typeId": "modern_assets.categoryShowcase",
+          "name": "Category Showcase",
+          "data": {
+            "title": "Shop by Category",
+            "subtitle": "Discover your perfect style",
+            "layout": "grid",
+            "categories": [
+              {
+                "id": "womens-fashion",
+                "name": "Women's Fashion",
+                "image": "https://picsum.photos/300/300",
+                "itemCount": 245,
+                "featured": true
+              },
+              {
+                "id": "mens-fashion",
+                "name": "Men's Fashion",
+                "image": "https://picsum.photos/300/300",
+                "itemCount": 189,
+                "featured": true
+              },
+              {
+                "id": "accessories",
+                "name": "Accessories",
+                "image": "https://picsum.photos/300/300",
+                "itemCount": 156,
+                "featured": false
+              },
+              {
+                "id": "shoes",
+                "name": "Footwear",
+                "image": "https://picsum.photos/300/300",
+                "itemCount": 98,
+                "featured": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "featured-products-1",
+          "typeId": "modern_assets.productCarousel",
+          "name": "Featured Products Carousel",
+          "data": {
+            "title": "Trending Now",
+            "subtitle": "Most loved items this week",
+            "showViewAll": true,
+            "viewAllLink": "/trending",
+            "autoplay": true,
+            "autoplayInterval": 4000,
+            "products": [
+              {
+                "id": "prod-001",
+                "name": "Elegant Summer Dress",
+                "price": 89.99,
+                "originalPrice": 129.99,
+                "discount": 31,
+                "image": "https://picsum.photos/300/240",
+                "rating": 4.8,
+                "reviewCount": 124,
+                "badge": "Bestseller"
+              },
+              {
+                "id": "prod-002",
+                "name": "Classic Denim Jacket",
+                "price": 79.99,
+                "originalPrice": 99.99,
+                "discount": 20,
+                "image": "https://picsum.photos/300/240",
+                "rating": 4.6,
+                "reviewCount": 89,
+                "badge": "New"
+              },
+              {
+                "id": "prod-003",
+                "name": "Minimalist Sneakers",
+                "price": 119.99,
+                "image": "https://picsum.photos/300/240",
+                "rating": 4.9,
+                "reviewCount": 203,
+                "badge": "Premium"
+              },
+              {
+                "id": "prod-004",
+                "name": "Silk Scarf Collection",
+                "price": 45.99,
+                "originalPrice": 65.99,
+                "discount": 30,
+                "image": "https://picsum.photos/300/240",
+                "rating": 4.7,
+                "reviewCount": 67
+              }
+            ]
+          }
+        },
+        {
+          "id": "promo-banner-1",
+          "typeId": "modern_assets.promoBanner",
+          "name": "Promotional Banner",
+          "data": {
+            "title": "Limited Time Offer",
+            "subtitle": "Up to 50% Off Selected Items",
+            "description": "Don't miss out on our biggest sale of the season",
+            "ctaText": "Shop Sale",
+            "ctaLink": "/sale",
+            "backgroundColor": "#1f2937",
+            "textColor": "#ffffff",
+            "accentColor": "#f59e0b",
+            "timer": {
+              "enabled": true,
+              "endDate": "2024-07-31T23:59:59Z"
+            }
+          }
+        },
+        {
+          "id": "brand-story-1",
+          "typeId": "modern_assets.brandStory",
+          "name": "Brand Story Section",
+          "data": {
+            "title": "Our Story",
+            "subtitle": "Crafting timeless fashion since 2010",
+            "description": "We believe in sustainable fashion that doesn't compromise on style. Every piece is carefully curated to bring you the perfect blend of comfort, quality, and contemporary design.",
+            "image": "https://picsum.photos/400/600",
+            "features": [
+              {
+                "icon": "leaf",
+                "title": "Sustainable",
+                "description": "Eco-friendly materials"
+              },
+              {
+                "icon": "award",
+                "title": "Quality",
+                "description": "Premium craftsmanship"
+              },
+              {
+                "icon": "truck",
+                "title": "Fast Delivery",
+                "description": "Free shipping worldwide"
+              }
+            ],
+            "ctaText": "Learn More",
+            "ctaLink": "/about"
+          }
+        },
+        {
+          "id": "collection-grid-1",
+          "typeId": "modern_assets.collectionGrid",
+          "name": "Collection Grid",
+          "data": {
+            "title": "Curated Collections",
+            "collections": [
+              {
+                "id": "summer-essentials",
+                "name": "Summer Essentials",
+                "description": "Light, breezy pieces for warm days",
+                "image": "https://picsum.photos/400/300",
+                "itemCount": 24,
+                "startingPrice": 29.99
+              },
+              {
+                "id": "work-wear",
+                "name": "Professional Wear",
+                "description": "Sophisticated pieces for the workplace",
+                "image": "https://picsum.photos/400/300",
+                "itemCount": 18,
+                "startingPrice": 79.99
+              },
+              {
+                "id": "weekend-casual",
+                "name": "Weekend Casual",
+                "description": "Comfortable styles for relaxed days",
+                "image": "https://picsum.photos/400/300",
+                "itemCount": 32,
+                "startingPrice": 39.99
+              }
+            ]
+          }
+        },
+        {
+          "id": "testimonials-1",
+          "typeId": "modern_assets.testimonials",
+          "name": "Customer Testimonials",
+          "data": {
+            "title": "What Our Customers Say",
+            "testimonials": [
+              {
+                "id": "test-1",
+                "name": "Sarah Johnson",
+                "avatar": "https://picsum.photos/80/80",
+                "rating": 5,
+                "text": "Absolutely love the quality and style! The fit is perfect and the fabric feels amazing.",
+                "location": "New York, NY"
+              },
+              {
+                "id": "test-2",
+                "name": "Michael Chen",
+                "avatar":  "https://picsum.photos/80/80",
+                "rating": 5,
+                "text": "Fast shipping and excellent customer service. The clothes exceeded my expectations!",
+                "location": "Los Angeles, CA"
+              },
+              {
+                "id": "test-3",
+                "name": "Emma Wilson",
+                "avatar":  "https://picsum.photos/80/80",
+                "rating": 5,
+                "text": "Sustainable fashion that actually looks good. Finally found my go-to brand!",
+                "location": "Chicago, IL"
+              }
+            ]
+          }
+        },
+        {
+          "id": "newsletter-1",
+          "typeId": "modern_assets.newsletter",
+          "name": "Newsletter Signup",
+          "data": {
+            "title": "Stay in Style",
+            "subtitle": "Get the latest trends and exclusive offers delivered to your inbox",
+            "placeholder": "Enter your email address",
+            "ctaText": "Subscribe",
+            "benefits": ["Early access to new collections", "Exclusive member discounts", "Style tips and trends"],
+            "backgroundImage":  "https://picsum.photos/300/800"
+          }
+        }
+      ]
+    }
+  ]
+}

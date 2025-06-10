@@ -1,42 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { ImageBackground } from "expo-image";
 import { router, Tabs } from "expo-router";
 import {
-  ActivityIndicator,
-  Pressable,
-  useWindowDimensions,
-  View,
+  Pressable
 } from "react-native";
 import Icon from "~/components/icon";
-import MaskedBlur from "~/components/ui/masked-blur";
 import { AuthTypes } from "~/integrations/salesforce/enums";
 import { getBasketQueryOptions } from "~/integrations/salesforce/options/basket";
 import { getCustomerQueryOptions } from "~/integrations/salesforce/options/customer";
 
 /* Main Tabs */
 export default function TabsLayout() {
-  const { width, height } = useWindowDimensions();
-
-  const { data: customer, isLoading } = useQuery(getCustomerQueryOptions());
-
+  const { data: customer } = useQuery(getCustomerQueryOptions());
   const { data: basket } = useQuery(getBasketQueryOptions());
-
-  if (isLoading) {
-    /* Ensure customer is loaded */
-    return (
-      <ImageBackground source={require("assets/images/bg.png")}>
-        <View
-          className="flex items-center justify-end"
-          style={{ width, height }}
-        >
-          <View className="inset-x-0 bottom-0 w-full pb-20 pt-32">
-            <MaskedBlur />
-            <ActivityIndicator />
-          </View>
-        </View>
-      </ImageBackground>
-    );
-  }
 
   return (
     <Tabs>
@@ -55,6 +30,7 @@ export default function TabsLayout() {
           tabBarButton: ({ onPress, ...props }) => {
             return (
               /* Reset the drawer */
+              //@ts-ignore
               <Pressable
                 onPress={() => {
                   router.replace("/");

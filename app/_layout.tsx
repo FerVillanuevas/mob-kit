@@ -13,6 +13,7 @@ import {
   QueryClient,
   QueryClientProvider,
   QueryKey,
+  useQueries,
 } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -23,9 +24,11 @@ import { useColorScheme } from "~/lib/useColorSchema";
 
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
-import { Stack } from "expo-router";
+import { SplashScreen, Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { toast, Toaster } from "sonner-native";
+import { getBasketQueryOptions } from "~/integrations/salesforce/options/basket";
+import { getCustomerQueryOptions } from "~/integrations/salesforce/options/customer";
 
 syncObservable(salesforceStore$, {
   persist: {
@@ -58,7 +61,23 @@ declare module "@tanstack/react-query" {
   }
 }
 
+SplashScreen.preventAutoHideAsync();
+
 const RootComponent = () => {
+  const [customer, basket] = useQueries({
+    queries: [getCustomerQueryOptions(), getBasketQueryOptions()],
+  });
+
+  useEffect(() => {
+    const hide = async () => {
+      if (!customer.isLoading || !basket.isLoading) {
+        await SplashScreen.hideAsync();
+      }
+    };
+
+    hide();
+  }, [customer, basket]);
+
   {
     /* Main Stack, all other routes will be pushed on top, like product */
   }

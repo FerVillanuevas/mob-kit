@@ -9,9 +9,12 @@ import { ExtensionStorage } from "@bacons/apple-targets";
 import { DrawerActions } from "@react-navigation/native";
 import { router, useNavigation } from "expo-router";
 import { useEffect } from "react";
+import { PageRenderer } from "~/components/experience/page-render";
+import Loading from "~/components/loading";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import useRootCategories from "~/hooks/use-root-categories";
+import { getPageQueryOptions } from "~/integrations/salesforce/options/experience";
 
 // Create a storage object with the App Group.
 const storage = new ExtensionStorage(
@@ -30,12 +33,31 @@ export default function Index() {
     }),
   );
 
+  const { data: page, isLoading } = useQuery(
+    getPageQueryOptions({
+      pageId: "homepage-example",
+    }),
+  );
+
   useEffect(() => {
     if (data) {
       storage.set("recommendations", JSON.stringify(data));
       ExtensionStorage.reloadWidget();
     }
   }, [data]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (page?.id) {
+    /* You should pass the actual page from Commerce, those are demo components.
+       build you own
+
+       <PageRenderer page={page} />
+    */
+    return <PageRenderer />;
+  }
 
   return (
     <ScrollView>
