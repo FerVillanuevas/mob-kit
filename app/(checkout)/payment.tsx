@@ -1,9 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { ShopperBasketsTypes, ShopperCustomersTypes } from "commerce-sdk-isomorphic";
+import {
+  ShopperBasketsTypes,
+  ShopperCustomersTypes,
+} from "commerce-sdk-isomorphic";
 import { Redirect, router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
+import AvoidingBlur from "~/components/avoiding-blur";
 import KeyboardView from "~/components/keyboard-view";
 import Loading from "~/components/loading";
 import { Button } from "~/components/ui/button";
@@ -11,7 +15,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -90,111 +93,113 @@ const Form = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Contact Information</CardTitle>
-        <CardDescription>
-          {isRegistered
-            ? "Welcome back! Continue with your email address."
-            : "Please provide your email to continue checkout."}
-        </CardDescription>
-      </CardHeader>
+    <View className="flex flex-1">
+      <KeyboardView>
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment Information</CardTitle>
+            <CardDescription>Payment method</CardDescription>
+          </CardHeader>
 
-      <CardContent className="space-y-4">
-        <Controller
-          control={form.control}
-          name="holder"
-          render={({ field }) => (
-            <View className="gap-2">
-              <Label>Name</Label>
-              <Input
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                value={field.value}
+          <CardContent className="gap-y-4">
+            <Controller
+              control={form.control}
+              name="holder"
+              render={({ field }) => (
+                <View className="gap-2">
+                  <Label>Name</Label>
+                  <Input
+                    onBlur={field.onBlur}
+                    onChangeText={field.onChange}
+                    value={field.value}
+                  />
+                </View>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="maskedNumber"
+              render={({ field }) => (
+                <View className="gap-2">
+                  <Label>Card Number</Label>
+                  <Input
+                    onBlur={field.onBlur}
+                    onChangeText={field.onChange}
+                    value={field.value}
+                  />
+                </View>
+              )}
+            />
+            <View className="flex flex-row gap-3">
+              <Controller
+                control={form.control}
+                name="expirationMonth"
+                render={({ field }) => (
+                  <View className="flex-1 gap-2">
+                    <Label>Month</Label>
+                    <Input
+                      keyboardType="number-pad"
+                      onBlur={field.onBlur}
+                      onChangeText={field.onChange}
+                      value={field.value}
+                    />
+                  </View>
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="expirationYear"
+                render={({ field }) => (
+                  <View className="flex-1 gap-2">
+                    <Label>Year</Label>
+                    <Input
+                      keyboardType="number-pad"
+                      onBlur={field.onBlur}
+                      onChangeText={field.onChange}
+                      value={field.value}
+                    />
+                  </View>
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="cvv"
+                render={({ field }) => (
+                  <View className="gap-2 min-w-16">
+                    <Label>CVV</Label>
+                    <Input
+                      keyboardType="number-pad"
+                      onBlur={field.onBlur}
+                      onChangeText={field.onChange}
+                      value={field.value}
+                    />
+                  </View>
+                )}
               />
             </View>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="maskedNumber"
-          render={({ field }) => (
-            <View className="gap-2">
-              <Label>Card Number</Label>
-              <Input
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                value={field.value}
-              />
-            </View>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="expirationMonth"
-          render={({ field }) => (
-            <View className="gap-2">
-              <Label>Month</Label>
-              <Input
-                keyboardType="number-pad"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                value={field.value}
-              />
-            </View>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="expirationYear"
-          render={({ field }) => (
-            <View className="gap-2">
-              <Label>Year</Label>
-              <Input
-                keyboardType="number-pad"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                value={field.value}
-              />
-            </View>
-          )}
-        />
-        <Controller
-          control={form.control}
-          name="cvv"
-          render={({ field }) => (
-            <View className="gap-2">
-              <Label>CVV</Label>
-              <Input
-                keyboardType="number-pad"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                value={field.value}
-              />
-            </View>
-          )}
-        />
-      </CardContent>
-
-      <CardFooter className="flex justify-between">
+          </CardContent>
+        </Card>
+      </KeyboardView>
+      <AvoidingBlur bottom={0} className="flex flex-row gap-4">
         <Button variant="outline" onPress={handleBack}>
-          <Text> Back to Cart</Text>
+          <Text>Back</Text>
         </Button>
         <Button
           disabled={addPaymentInstrumentToBasketMutation.isPending}
           onPress={form.handleSubmit(handleSubmit)}
+          className="flex-1"
         >
-          <Text>Continue</Text>
+          <Text>Review Order</Text>
         </Button>
-      </CardFooter>
-    </Card>
+      </AvoidingBlur>
+    </View>
   );
 };
 
 export default function PaymentPage() {
   const { data: customer, isLoading } = useQuery(getCustomerQueryOptions());
   const { data: basket, isLoading: isBasketLoading } = useQuery(
-    getBasketQueryOptions()
+    getBasketQueryOptions(),
   );
 
   if (isLoading || isBasketLoading) {
@@ -205,11 +210,5 @@ export default function PaymentPage() {
     return <Redirect href="/" />;
   }
 
-  return (
-    <KeyboardView>
-      <View className="p-4">
-        <Form customer={customer} basket={basket} />
-      </View>
-    </KeyboardView>
-  );
+  return <Form customer={customer} basket={basket} />;
 }

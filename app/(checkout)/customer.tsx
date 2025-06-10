@@ -1,8 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { ShopperBasketsTypes, ShopperCustomersTypes } from "commerce-sdk-isomorphic";
+import {
+  ShopperBasketsTypes,
+  ShopperCustomersTypes,
+} from "commerce-sdk-isomorphic";
 import { Redirect, router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
+import AvoidingBlur from "~/components/avoiding-blur";
 import KeyboardView from "~/components/keyboard-view";
 import Loading from "~/components/loading";
 import { Button } from "~/components/ui/button";
@@ -10,7 +14,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -62,64 +65,68 @@ const Form = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Contact Information</CardTitle>
-        <CardDescription>
-          {isRegistered
-            ? "Welcome back! Continue with your email address."
-            : "Please provide your email to continue checkout."}
-        </CardDescription>
-      </CardHeader>
+    <View className="flex flex-1">
+      <KeyboardView>
+        <Card>
+          <CardHeader>
+            <CardTitle>Contact Information</CardTitle>
+            <CardDescription>
+              {isRegistered
+                ? "Welcome back! Continue with your email address."
+                : "Please provide your email to continue checkout."}
+            </CardDescription>
+          </CardHeader>
 
-      <CardContent className="space-y-4">
-        <Controller
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <View className="gap-2">
-              <Label>Email</Label>
-              <Input
-                placeholder="Email address"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                value={field.value}
-              />
-            </View>
-          )}
-        />
-        {isRegistered && (
-          <Small className="text-muted-foreground text-sm">
-            Youre signed in as {customer?.firstName} {customer?.lastName}
-          </Small>
-        )}
-      </CardContent>
-
-      <CardFooter className="flex justify-between">
+          <CardContent className="space-y-4">
+            <Controller
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <View className="gap-2">
+                  <Label>Email</Label>
+                  <Input
+                    placeholder="Email address"
+                    onBlur={field.onBlur}
+                    onChangeText={field.onChange}
+                    value={field.value}
+                  />
+                </View>
+              )}
+            />
+            {isRegistered && (
+              <Small className="text-sm text-muted-foreground">
+                Youre signed in as {customer?.firstName} {customer?.lastName}
+              </Small>
+            )}
+          </CardContent>
+        </Card>
+      </KeyboardView>
+      <AvoidingBlur bottom={0} className="flex flex-row gap-4">
         <Button
           variant="outline"
           disabled={deleteBasketMutation.isPending}
           onPress={handleDestroy}
         >
-          <Text> Back to Cart</Text>
+          <Text>Back to Cart</Text>
         </Button>
         <Button
+          className="flex-1"
           disabled={updateCustomerForBasketMutation.isPending}
           onPress={form.handleSubmit(handleCustomerInfo)}
         >
           <Text>
-            {isRegistered ? "Continue to Shipping" : "Continue as Guest"}
+            {isRegistered ? "Continue to Address" : "Continue as Guest"}
           </Text>
         </Button>
-      </CardFooter>
-    </Card>
+      </AvoidingBlur>
+    </View>
   );
 };
 
 export default function CheckoutPage() {
   const { data: customer, isLoading } = useQuery(getCustomerQueryOptions());
   const { data: basket, isLoading: isBasketLoading } = useQuery(
-    getBasketQueryOptions()
+    getBasketQueryOptions(),
   );
 
   if (isLoading || isBasketLoading) {
@@ -130,11 +137,5 @@ export default function CheckoutPage() {
     return <Redirect href="/" />;
   }
 
-  return (
-    <KeyboardView>
-      <View className="p-4">
-        <Form customer={customer} basket={basket} />
-      </View>
-    </KeyboardView>
-  );
+  return <Form customer={customer} basket={basket} />;
 }

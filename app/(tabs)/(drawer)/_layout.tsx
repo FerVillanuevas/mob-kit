@@ -7,7 +7,6 @@ export default function StackLayout() {
       drawerContent={CategoryDrawer}
       screenOptions={{
         drawerType: "slide",
-        overlayColor: "rgba(0, 0, 0, 0.5)",
       }}
     />
   );

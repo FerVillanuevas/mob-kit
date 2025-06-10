@@ -45,6 +45,16 @@ export const addItemToNewOrExistingBasket = async ({
       throw new Error("Failed to get or create basket");
     }
 
+    await shopperBasket.updateShippingMethodForShipment({
+      parameters: {
+        basketId: basketId,
+        shipmentId: "me",
+      },
+      body: {
+        id: "001",
+      },
+    });
+
     return await shopperBasket.addItemToBasket({
       parameters: {
         basketId,

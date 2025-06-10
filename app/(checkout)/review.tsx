@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import { ScrollView, View } from "react-native";
+import AvoidingBlur from "~/components/avoiding-blur";
 import Loading from "~/components/loading";
 import { Button } from "~/components/ui/button";
 import {
@@ -17,10 +18,10 @@ import { getBasketQueryOptions } from "~/integrations/salesforce/options/basket"
 import { getCustomerQueryOptions } from "~/integrations/salesforce/options/customer";
 import { useCreateOrderMutation } from "~/integrations/salesforce/options/orders";
 
-export  default function ReviewPage() {
+export default function ReviewPage() {
   const { data: customer, isLoading } = useQuery(getCustomerQueryOptions());
   const { data: basket, isLoading: isBasketLoading } = useQuery(
-    getBasketQueryOptions()
+    getBasketQueryOptions(),
   );
 
   const createOrderMutation = useCreateOrderMutation();
@@ -42,27 +43,27 @@ export  default function ReviewPage() {
   }
 
   return (
-    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-      <View className="space-y-6 p-4">
-        <Card>
+    <View className="flex-1">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Card className="mb-24">
           <CardHeader>
             <CardTitle>Review Your Order</CardTitle>
             <CardDescription>
               Please review your information before placing your order
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="gap-y-4">
             {/* Customer Information */}
             <View>
               <H3 className="mb-2 font-semibold">Contact Information</H3>
-              <View className="space-y-1">
-                <Text className="text-muted-foreground text-sm">
+              <View className="gap-y-1">
+                <Text className="text-sm text-muted-foreground">
                   {customer?.firstName} {customer?.lastName}
                 </Text>
-                <Text className="text-muted-foreground text-sm">
+                <Text className="text-sm text-muted-foreground">
                   {customer?.email}
                 </Text>
-                <Text className="text-muted-foreground text-sm">
+                <Text className="text-sm text-muted-foreground">
                   {customer?.phone}
                 </Text>
               </View>
@@ -73,22 +74,22 @@ export  default function ReviewPage() {
             {/* Shipping Address */}
             <View>
               <H3 className="mb-2 font-semibold">Shipping Address</H3>
-              <View className="space-y-1">
+              <View className="gap-y-1">
                 {basket?.shipments?.[0]?.shippingAddress && (
                   <>
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       {basket.shipments[0].shippingAddress.firstName}{" "}
                       {basket.shipments[0].shippingAddress.lastName}
                     </Text>
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       {basket.shipments[0].shippingAddress.address1}
                     </Text>
                     {basket.shipments[0].shippingAddress.address2 && (
-                      <Text className="text-muted-foreground text-sm">
+                      <Text className="text-sm text-muted-foreground">
                         {basket.shipments[0].shippingAddress.address2}
                       </Text>
                     )}
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       {basket.shipments[0].shippingAddress.city},{" "}
                       {basket.shipments[0].shippingAddress.stateCode}{" "}
                       {basket.shipments[0].shippingAddress.postalCode}
@@ -106,10 +107,10 @@ export  default function ReviewPage() {
               <View>
                 {basket?.shipments?.[0]?.shippingMethod && (
                   <View className="flex-row justify-between">
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       {basket.shipments[0].shippingMethod.name}
                     </Text>
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       {basket.shipments[0].shippingMethod.price}
                     </Text>
                   </View>
@@ -125,13 +126,13 @@ export  default function ReviewPage() {
               <View>
                 {basket?.paymentInstruments?.[0] && (
                   <>
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       Card ending in{" "}
                       {basket.paymentInstruments[0].paymentCard?.maskedNumber?.slice(
-                        -4
+                        -4,
                       )}
                     </Text>
-                    <Text className="text-muted-foreground text-sm">
+                    <Text className="text-sm text-muted-foreground">
                       Expires{" "}
                       {
                         basket.paymentInstruments[0].paymentCard
@@ -150,18 +151,18 @@ export  default function ReviewPage() {
             {/* Order Items */}
             <View>
               <H3 className="mb-2 font-semibold">Order Items</H3>
-              <View className="space-y-3">
+              <View className="gap-y-3">
                 {basket?.productItems?.map((item: any) => (
                   <View key={item.itemId} className="flex-row justify-between">
                     <View className="flex-1">
-                      <Text className="font-medium text-sm">
+                      <Text className="text-sm font-medium">
                         {item.productName}
                       </Text>
-                      <Text className="text-muted-foreground text-sm">
+                      <Text className="text-sm text-muted-foreground">
                         Quantity: {item.quantity}
                       </Text>
                     </View>
-                    <Text className="font-medium text-sm">{item.price}</Text>
+                    <Text className="text-sm font-medium">{item.price}</Text>
                   </View>
                 ))}
               </View>
@@ -173,9 +174,9 @@ export  default function ReviewPage() {
                 <Separator />
                 <View>
                   <H3 className="mb-2 font-semibold">Order Summary</H3>
-                  <View className="space-y-2">
+                  <View className="gap-y-2">
                     <View className="flex-row justify-between">
-                      <Text className="text-muted-foreground text-sm">
+                      <Text className="text-sm text-muted-foreground">
                         Subtotal
                       </Text>
                       <Text className="text-sm">
@@ -184,7 +185,7 @@ export  default function ReviewPage() {
                     </View>
                     {basket.shippingTotal && (
                       <View className="flex-row justify-between">
-                        <Text className="text-muted-foreground text-sm">
+                        <Text className="text-sm text-muted-foreground">
                           Shipping
                         </Text>
                         <Text className="text-sm">{basket.shippingTotal}</Text>
@@ -192,7 +193,7 @@ export  default function ReviewPage() {
                     )}
                     {basket.taxTotal && (
                       <View className="flex-row justify-between">
-                        <Text className="text-muted-foreground text-sm">
+                        <Text className="text-sm text-muted-foreground">
                           Tax
                         </Text>
                         <Text className="text-sm">{basket.taxTotal}</Text>
@@ -201,7 +202,7 @@ export  default function ReviewPage() {
                     <Separator />
                     <View className="flex-row justify-between">
                       <Text className="font-semibold">Total</Text>
-                      <Text className="font-semibold text-lg">
+                      <Text className="text-lg font-semibold">
                         {basket.orderTotal}
                       </Text>
                     </View>
@@ -211,23 +212,22 @@ export  default function ReviewPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Action Buttons */}
-        <View className="flex-row justify-between gap-4 pb-8">
-          <Button
-            variant="outline"
-            onPress={() => {
-              router.back();
-            }}
-            className="flex-1"
-          >
-            <Text>Back to Payment</Text>
-          </Button>
-          <Button onPress={handleSubmit} size="lg" className="flex-1">
-            <Text>Place Order</Text>
-          </Button>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      {/* Action Buttons */}
+      <AvoidingBlur bottom={0} className="flex flex-row gap-4">
+        <Button
+          variant="outline"
+          onPress={() => {
+            router.back();
+          }}
+          className="flex-1"
+        >
+          <Text>Back</Text>
+        </Button>
+        <Button onPress={handleSubmit} className="flex-1">
+          <Text>Place Order</Text>
+        </Button>
+      </AvoidingBlur>
+    </View>
   );
 }
