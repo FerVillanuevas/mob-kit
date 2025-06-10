@@ -1,4 +1,4 @@
-import { ScrollView, StatusBar, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { ComponentRenderer } from "~/components/experience/component-renderer";
 import homepageData from "~/data/homepage.json";
 
@@ -8,15 +8,12 @@ export function PageRenderer() {
   );
 
   return (
-    <>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <ScrollView className="flex-1 bg-white">
-        <View className="pb-8">
-          {mainRegion?.components?.map((component) => (
-            <ComponentRenderer key={component.id} component={component} />
-          ))}
-        </View>
-      </ScrollView>
-    </>
+    <ScrollView className="flex-1">
+      <View className="pb-8">
+        {mainRegion?.components?.map((component) => (
+          <ComponentRenderer key={component.id} component={component} />
+        ))}
+      </View>
+    </ScrollView>
   );
 }

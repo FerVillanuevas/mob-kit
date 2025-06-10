@@ -30,7 +30,7 @@ export function CollectionGrid({ component }: CollectionGridProps) {
         {collections.map((collection, index) => (
           <TouchableOpacity
             key={collection.id}
-            className="overflow-hidden rounded-2xl bg-white shadow-sm border border-border"
+            className="overflow-hidden rounded-2xl border border-border"
           >
             <View className="flex-row">
               <Image source={{ uri: collection.image }} className="h-32 w-32" />

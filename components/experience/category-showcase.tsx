@@ -36,12 +36,12 @@ export function CategoryShowcase({ component }: CategoryShowcaseProps) {
             className={`${index < 2 ? "h-48 w-[48%]" : "h-32 w-[48%]"} mb-4 overflow-hidden rounded-2xl shadow-sm`}
           >
             <Image source={{ uri: category.image }} className="h-full w-full" />
-            <View className="absolute inset-0 bg-black/30" />
+            <View className="absolute inset-0 bg-black/60" />
             <View className="absolute bottom-4 left-4 right-4">
-              <Text className="mb-1 text-lg font-bold text-primary-foreground">
+              <Text className="mb-1 text-lg font-bold text-white">
                 {category.name}
               </Text>
-              <Muted>{category.itemCount} items</Muted>
+              <Muted className="text-white/90">{category.itemCount} items</Muted>
             </View>
           </TouchableOpacity>
         ))}
