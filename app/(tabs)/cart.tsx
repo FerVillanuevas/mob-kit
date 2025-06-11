@@ -8,6 +8,7 @@ import currency from "currency.js";
 import { router } from "expo-router";
 import { isEmpty } from "lodash";
 import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
+import EmptyHero from "~/components/commerce/empty-hero";
 import { QuantitySelector } from "~/components/commerce/quantity-selector";
 import Icon from "~/components/icon";
 import Image from "~/components/image";
@@ -270,21 +271,6 @@ const BasketItem = ({ product, basketId, ...item }: BasketItemProps) => {
 };
 
 // Empty Cart Component
-const EmptyCart = () => (
-  <View className="flex-1 items-center justify-center px-6">
-    <Icon name="bag-outline" size={80} className="mb-6 text-muted-foreground" />
-    <H1 className="mb-3 text-center">Your cart is empty</H1>
-    <Text className="mb-8 max-w-sm text-center text-muted-foreground">
-      Discover amazing products and add them to your cart to get started
-    </Text>
-    <Button onPress={() => router.push("/")} className="min-w-[200px]">
-      <View className="flex-row items-center gap-2">
-        <Icon name="storefront" size={16} className="text-primary-foreground" />
-        <Text>Start Shopping</Text>
-      </View>
-    </Button>
-  </View>
-);
 
 // Loading Component
 const CartLoading = () => (
@@ -367,7 +353,7 @@ export default function CartPage() {
 
   // No basket or empty cart
   if (!basket?.basketId || isEmpty(basket.productItems)) {
-    return <EmptyCart />;
+    return <EmptyHero />;
   }
 
   return (

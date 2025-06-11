@@ -1,9 +1,10 @@
 import { Check } from "lucide-react-native";
 import { useState } from "react";
-import { TextInput, View } from "react-native";
+import { View } from "react-native";
 import Image from "~/components/image";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
 
 interface NewsletterProps {
@@ -45,8 +46,8 @@ export function Newsletter({ component }: NewsletterProps) {
           </Text>
 
           <View className="mb-6 w-full max-w-sm">
-            <View className="flex-row overflow-hidden rounded-full bg-primary">
-              <TextInput
+            <View className="flex-row gap-2">
+              <Input
                 className="flex-1 px-4 py-3"
                 placeholder={placeholder}
                 value={email}
@@ -54,7 +55,7 @@ export function Newsletter({ component }: NewsletterProps) {
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
-              <Button onPress={handleSubscribe}>
+              <Button variant='secondary' onPress={handleSubscribe}>
                 <Text>{ctaText}</Text>
               </Button>
             </View>

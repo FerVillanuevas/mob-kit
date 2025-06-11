@@ -70,13 +70,13 @@ const RootComponent = () => {
 
   useEffect(() => {
     const hide = async () => {
-      if (!customer.isLoading || !basket.isLoading) {
+      if (!customer.isLoading && !basket.isLoading) {
         await SplashScreen.hideAsync();
       }
     };
 
     hide();
-  }, [customer, basket]);
+  }, [customer.isLoading, basket.isLoading]);
 
   {
     /* Main Stack, all other routes will be pushed on top, like product */

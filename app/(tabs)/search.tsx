@@ -7,10 +7,11 @@ import { debounce } from "lodash";
 import { useState } from "react";
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import AvoidingBlur from "~/components/avoiding-blur";
+import EmptyHero from "~/components/commerce/empty-hero";
 import Icon from "~/components/icon";
 import Image from "~/components/image";
 import { Input } from "~/components/ui/input";
-import { H1, H4, Muted, P } from "~/components/ui/typography";
+import { H4, P } from "~/components/ui/typography";
 import { getProductsByIdsQueryOptions } from "~/integrations/salesforce/options/products";
 import { getSearchSuggestionsOptions } from "~/integrations/salesforce/options/search";
 import { normalizeProduct } from "~/lib/commerce/utils";
@@ -75,39 +76,35 @@ export default function SearchPage() {
 
   return (
     <View className="flex flex-1 p-4">
-      <FlashList
-        data={data?.productSuggestions?.products}
-        estimatedItemSize={100}
-        ListEmptyComponent={
-          <View className="flex flex-1 items-center justify-center gap-4 py-32">
-            <Icon name="search-outline" size={64} />
-            <H1>No results found</H1>
-            <Muted>Try something similar</Muted>
-          </View>
-        }
-        renderItem={({ item }) => {
-          const product = products.find((p) => p.id === item.productId);
+      {data?.productSuggestions?.products ? (
+        <FlashList
+          data={data?.productSuggestions?.products}
+          estimatedItemSize={100}
+          renderItem={({ item }) => {
+            const product = products.find((p) => p.id === item.productId);
 
-          if (!product) {
-            return <></>;
-          }
+            if (!product) {
+              return <></>;
+            }
 
-          return (
-            <SearchResult
-              product={product}
-              onPress={() => {
-                router.push({
-                  pathname: "/product/[id]",
-                  params: {
-                    id: item.productId,
-                  },
-                });
-              }}
-            />
-          );
-        }}
-      />
-
+            return (
+              <SearchResult
+                product={product}
+                onPress={() => {
+                  router.push({
+                    pathname: "/product/[id]",
+                    params: {
+                      id: item.productId,
+                    },
+                  });
+                }}
+              />
+            );
+          }}
+        />
+      ) : (
+        <EmptyHero title="Search products" hideButton />
+      )}
       <AvoidingBlur bottom={0} style={{ paddingBottom: 8 }}>
         <Input placeholder="Search" onChangeText={handleChangeText} />
       </AvoidingBlur>
