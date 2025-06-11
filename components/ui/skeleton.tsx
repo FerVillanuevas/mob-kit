@@ -36,5 +36,5 @@ export function Skeleton({ className, pulse = false, ...props }: SkeletonProps) 
     }
   })
 
-  return <Animated.View className={cn("bg-muted/60", className)} style={animatedStyle} {...props} />
+  return <Animated.View className={cn("bg-secondary", className)} style={animatedStyle} {...props} />
 }
