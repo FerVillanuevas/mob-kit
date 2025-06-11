@@ -1,4 +1,5 @@
 import { queryOptions, useMutation } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { ProductListTypes } from "~/integrations/salesforce/enums";
 import {
   addItemToProductList,
@@ -89,7 +90,7 @@ export const useUpdateCustomerAddressMutation = () => {
     mutationFn: async (data: CreateCustomerAddressParams) =>
       updateCustomerAddress({ data }),
     meta: {
-      sucessMessage: "Address deleted",
+      sucessMessage: "Address updated",
       invalidateQuery: getCustomerQueryOptions().queryKey,
     },
   });
@@ -102,6 +103,9 @@ export const useDeleteCustomerAddressMutation = () => {
     meta: {
       sucessMessage: "Address deleted",
       invalidateQuery: getCustomerQueryOptions().queryKey,
+    },
+    onSuccess: () => {
+      router.back();
     },
   });
 };

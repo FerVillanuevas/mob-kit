@@ -59,6 +59,7 @@
     "expo-web-browser": "~14.1.6",
     "lodash": "^4.17.21",
     "lucide-react-native": "^0.513.0",
+    "nanoid": "^5.1.5",
     "nativewind": "^4.1.23",
     "react": "19.0.0",
     "react-dom": "19.0.0",

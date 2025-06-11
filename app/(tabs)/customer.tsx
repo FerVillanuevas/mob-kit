@@ -201,7 +201,9 @@ export default function CustomerPage() {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={() => {
+            router.push('/customer/address')
+          }}
           className="border-b border-border px-4 py-8"
         >
           <View className="flex flex-row items-center gap-4">
