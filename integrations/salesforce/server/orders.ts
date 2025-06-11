@@ -9,7 +9,7 @@ export const createOrder = async ({ data }) => {
     body: data.body,
   });
 };
-export const getOrder = async ({ data }) => {
+export const getOrder = async ({ data }: {data: {orderNo: string}}) => {
   const { api } = await getSalesforceAPI();
   const shopperOrders = await api.shopperOrders();
 

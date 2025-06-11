@@ -1,56 +1,55 @@
-"use client"
-
-import { FlashList } from "@shopify/flash-list"
-import { useQuery } from "@tanstack/react-query"
-import { router, useLocalSearchParams } from "expo-router"
-import { cssInterop } from "nativewind"
-import { useState } from "react"
-import { ScrollView, View } from "react-native"
-import { Drawer } from "react-native-drawer-layout"
-import FiltersContent from "~/components/commerce/filter-content"
-import { HeaderSkeleton } from "~/components/commerce/header-skeleton"
-import { Pagination } from "~/components/commerce/pagination"
-import ProductHit from "~/components/commerce/product-hit"
-import { ProductGridSkeleton } from "~/components/commerce/product-skeleton"
-import Icon from "~/components/icon"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { Skeleton } from "~/components/ui/skeleton"
-import { Text } from "~/components/ui/text"
-import { H1, H4 } from "~/components/ui/typography"
-import { getProductsQueryOptions } from "~/integrations/salesforce/options/products"
+import { FlashList } from "@shopify/flash-list";
+import { useQuery } from "@tanstack/react-query";
+import { router, useLocalSearchParams } from "expo-router";
+import { cssInterop } from "nativewind";
+import { useState } from "react";
+import { ScrollView, View } from "react-native";
+import { Drawer } from "react-native-drawer-layout";
+import FiltersContent from "~/components/commerce/filter-content";
+import { HeaderSkeleton } from "~/components/commerce/header-skeleton";
+import { Pagination } from "~/components/commerce/pagination";
+import ProductHit from "~/components/commerce/product-hit";
+import { ProductGridSkeleton } from "~/components/commerce/product-skeleton";
+import Icon from "~/components/icon";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Text } from "~/components/ui/text";
+import { H1, H4 } from "~/components/ui/typography";
+import { getProductsQueryOptions } from "~/integrations/salesforce/options/products";
 import {
   buildRefineArray,
   debugUrlParams,
   parseUrlParams,
   serializeSearchParams,
   type PLPSearchParams,
-} from "~/lib/commerce/url-params"
-import { REQUESTED_LIMIT } from "~/lib/constants"
+} from "~/lib/commerce/url-params";
+import { REQUESTED_LIMIT } from "~/lib/constants";
 
 const StyledDrawer = cssInterop(Drawer, {
   className: "drawerStyle",
-})
+});
 
 export default function CategoryPage() {
-  const params = useLocalSearchParams()
-  const categoryId = params.id as string
+  const params = useLocalSearchParams();
+  const categoryId = params.id as string;
 
   // Debug logging in development
   if (process.env.NODE_ENV === "development") {
-    debugUrlParams(params, "mobile")
+    debugUrlParams(params, "mobile");
   }
 
   // Parse URL parameters using shared utility (standardized on web format)
-  const { offset = 0, sort = "best-matches", refinements = {} } = parseUrlParams(params)
+  const {
+    offset = 0,
+    sort = "best-matches",
+    refinements = {},
+  } = parseUrlParams(params);
 
-
-  console.log(offset);
-
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   // Build refine array for API using shared utility
-  const refineArray = buildRefineArray(categoryId, refinements)
+  const refineArray = buildRefineArray(categoryId, refinements);
 
   const {
     data: products,
@@ -64,18 +63,18 @@ export default function CategoryPage() {
       limit: REQUESTED_LIMIT,
       offset: offset,
     }),
-  )
+  );
 
   const navigate = (updateFn: (prev: PLPSearchParams) => PLPSearchParams) => {
-    const currentSearch = { offset, sort, refinements }
-    const newSearch = updateFn(currentSearch)
+    const currentSearch = { offset, sort, refinements };
+    const newSearch = updateFn(currentSearch);
 
     // Serialize params for mobile using shared utility (standardized on web format)
-    const serializedParams = serializeSearchParams(newSearch, "mobile")
+    const serializedParams = serializeSearchParams(newSearch, "mobile");
 
     // Debug logging for navigation
     if (process.env.NODE_ENV === "development") {
-      console.log("[MOBILE] Navigating with params:", serializedParams)
+      console.log("[MOBILE] Navigating with params:", serializedParams);
     }
 
     router.replace({
@@ -84,53 +83,56 @@ export default function CategoryPage() {
         id: categoryId,
         ...serializedParams,
       },
-    })
-  }
+    });
+  };
 
   const handleSelectedRefinement = (attributeId: string, value: string) => {
-    const currentValues = refinements[attributeId] || []
+    const currentValues = refinements[attributeId] || [];
     const newValues = currentValues.includes(value)
       ? currentValues.filter((v) => v !== value)
-      : [...currentValues, value]
+      : [...currentValues, value];
 
-    const newRefinements = { ...refinements }
+    const newRefinements = { ...refinements };
     if (newValues.length === 0) {
-      delete newRefinements[attributeId]
+      delete newRefinements[attributeId];
     } else {
-      newRefinements[attributeId] = newValues
+      newRefinements[attributeId] = newValues;
     }
 
     navigate((prev) => ({
       ...prev,
       refinements: Object.keys(newRefinements).length > 0 ? newRefinements : {},
       offset: 0, // Reset to first page when filtering
-    }))
-  }
+    }));
+  };
 
   const handleOnSortChange = (newSort: string) => {
     navigate((prev) => ({
       ...prev,
       sort: newSort,
       offset: 0, // Reset to first page when sorting
-    }))
-  }
+    }));
+  };
 
   const handleClearFilters = () => {
     navigate((prev) => ({
       ...prev,
       refinements: {},
       offset: 0,
-    }))
-    setOpen(false)
-  }
+    }));
+    setOpen(false);
+  };
 
   // Calculate active filters count
-  const activeFiltersCount = Object.values(refinements).reduce((acc, values) => acc + values.length, 0)
+  const activeFiltersCount = Object.values(refinements).reduce(
+    (acc, values) => acc + values.length,
+    0,
+  );
 
-  const productData = products
-  const isInitialLoading = isLoading && !productData
+  const productData = products;
+  const isInitialLoading = isLoading && !productData;
 
-  const handleAddToWishlist = () => {}
+  const handleAddToWishlist = () => {};
 
   return (
     <StyledDrawer
@@ -153,7 +155,7 @@ export default function CategoryPage() {
               isLoading={isLoading || isFetching}
             />
           </ScrollView>
-        )
+        );
       }}
     >
       <FlashList
@@ -165,22 +167,32 @@ export default function CategoryPage() {
                 <HeaderSkeleton />
                 <ProductGridSkeleton numColumns={2} numItems={6} />
               </View>
-            )
+            );
           }
 
           return (
             <View className="flex-1 items-center justify-center px-6 py-20">
-              <Icon name="search" size={48} className="mb-6 text-muted-foreground" />
-              <Text className="mb-2 text-center text-xl font-medium">No products found</Text>
+              <Icon
+                name="search"
+                size={48}
+                className="mb-6 text-muted-foreground"
+              />
+              <Text className="mb-2 text-center text-xl font-medium">
+                No products found
+              </Text>
               <Text className="mb-8 text-center text-muted-foreground">
                 Try adjusting your filters or search for something else
               </Text>
-              <Button variant="outline" onPress={handleClearFilters} className="min-w-[180px]">
+              <Button
+                variant="outline"
+                onPress={handleClearFilters}
+                className="min-w-[180px]"
+              >
                 <Icon name="refresh" size={16} className="mr-2" />
                 <Text>Clear Filters</Text>
               </Button>
             </View>
-          )
+          );
         }}
         ListHeaderComponent={() => {
           return (
@@ -189,7 +201,9 @@ export default function CategoryPage() {
                 <H1>Products</H1>
                 <View className="mt-1 flex-row items-center">
                   <H4 className="text-muted-foreground">
-                    {productData?.total ? `${productData.total} results` : "Loading results..."}
+                    {productData?.total
+                      ? `${productData.total} results`
+                      : "Loading results..."}
                   </H4>
                   {isFetching && !isInitialLoading && (
                     <View className="ml-2">
@@ -202,7 +216,7 @@ export default function CategoryPage() {
               <Button
                 size="sm"
                 onPress={() => {
-                  setOpen(true)
+                  setOpen(true);
                 }}
                 className="flex-row items-center gap-2 shadow-sm"
               >
@@ -214,7 +228,7 @@ export default function CategoryPage() {
                 <Text>Filters</Text>
               </Button>
             </View>
-          )
+          );
         }}
         numColumns={2}
         estimatedItemSize={315}
@@ -228,13 +242,13 @@ export default function CategoryPage() {
                   params: {
                     id: item.productId,
                   },
-                })
+                });
               }}
               onWishListToggle={handleAddToWishlist}
               product={item}
               className="w-full p-4"
             />
-          )
+          );
         }}
         ListFooterComponent={() => (
           <View className="px-4 py-6">
@@ -248,9 +262,9 @@ export default function CategoryPage() {
         )}
         refreshing={isFetching && !isInitialLoading}
         onRefresh={() => {
-          refetch()
+          refetch();
         }}
       />
     </StyledDrawer>
-  )
+  );
 }

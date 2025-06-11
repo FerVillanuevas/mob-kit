@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { ShopperCustomersTypes } from "commerce-sdk-isomorphic";
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity, View } from "react-native";
 import Icon from "~/components/icon";
@@ -178,7 +178,9 @@ export default function CustomerPage() {
 
       <View className="flex flex-1 flex-col">
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={() => {
+            router.push('/customer/orders')
+          }}
           className="border-b border-border px-4 py-8"
         >
           <View className="flex flex-row items-center gap-4">

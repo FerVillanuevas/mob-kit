@@ -1,9 +1,14 @@
 import { ShopperCustomersTypes } from "commerce-sdk-isomorphic";
 import { SalesforceCommerceClient } from "~/integrations/salesforce/client";
+import { ProductListTypes } from "~/integrations/salesforce/enums";
 import {
   getSalesforceAPI,
   salesforceConfig,
 } from "~/integrations/salesforce/server/config";
+import {
+  CreateCustomerAddressParams,
+  CustomerOrdersParams,
+} from "~/integrations/salesforce/types/params";
 import { RegisterFormData } from "~/lib/forms/customer";
 
 export const authenticateCustomer = async ({
@@ -42,6 +47,7 @@ export const registerCustomer = async ({
 
   return await client.authenticateCustomer(data.email, data.password);
 };
+
 export const logoutCustomer = async () => {
   const client = new SalesforceCommerceClient(salesforceConfig);
   await client.authenticateAsGuest();
@@ -70,7 +76,11 @@ export const customerProductLists = async () => {
   });
 };
 
-export const createProductList = async ({ data }) => {
+export const createProductList = async ({
+  data,
+}: {
+  data: { type: ProductListTypes };
+}) => {
   const { api, client } = await getSalesforceAPI();
 
   const shopperCustomers = await api.shopperCustomers();
@@ -86,7 +96,11 @@ export const createProductList = async ({ data }) => {
   });
 };
 
-export const addItemToProductList = async ({ data }) => {
+export const addItemToProductList = async ({
+  data,
+}: {
+  data: { listId: string; productId: string };
+}) => {
   const { api, client } = await getSalesforceAPI();
   const customerId = await client.getCustomerId();
 
@@ -107,7 +121,11 @@ export const addItemToProductList = async ({ data }) => {
   });
 };
 
-export const getCustomerOrders = async ({ data }) => {
+export const getCustomerOrders = async ({
+  data,
+}: {
+  data: CustomerOrdersParams;
+}) => {
   const { api, client } = await getSalesforceAPI();
   const shopperCustomers = await api.shopperCustomers();
   const customerId = await client.getCustomerId();
@@ -120,7 +138,11 @@ export const getCustomerOrders = async ({ data }) => {
   })) as ShopperCustomersTypes.CustomerOrderResult;
 };
 
-export const createCustomerAddress = async ({ data }) => {
+export const createCustomerAddress = async ({
+  data,
+}: {
+  data: CreateCustomerAddressParams;
+}) => {
   const { api, client } = await getSalesforceAPI();
   const shopperCustomers = await api.shopperCustomers();
   const customerId = await client.getCustomerId();
@@ -133,7 +155,11 @@ export const createCustomerAddress = async ({ data }) => {
   });
 };
 
-export const updateCustomerAddress = async ({ data }) => {
+export const updateCustomerAddress = async ({
+  data,
+}: {
+  data: CreateCustomerAddressParams;
+}) => {
   const { api, client } = await getSalesforceAPI();
   const shopperCustomers = await api.shopperCustomers();
   const customerId = await client.getCustomerId();
@@ -147,7 +173,11 @@ export const updateCustomerAddress = async ({ data }) => {
   });
 };
 
-export const deleteCustomerAddress = async ({ data }) => {
+export const deleteCustomerAddress = async ({
+  data,
+}: {
+  data: { addressId: string };
+}) => {
   const { api, client } = await getSalesforceAPI();
   const shopperCustomers = await api.shopperCustomers();
   const customerId = await client.getCustomerId();
@@ -160,7 +190,11 @@ export const deleteCustomerAddress = async ({ data }) => {
   });
 };
 
-export const deleteItemFormProductList = async ({ data }) => {
+export const deleteItemFormProductList = async ({
+  data,
+}: {
+  data: { listId: string; itemId: string };
+}) => {
   const { api, client } = await getSalesforceAPI();
 
   const customerId = await client.getCustomerId();
