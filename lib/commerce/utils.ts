@@ -2,6 +2,9 @@ import {
   ShopperProductsTypes,
   ShopperSearchTypes,
 } from "commerce-sdk-isomorphic";
+import { CardTypes } from "~/integrations/salesforce/enums";
+
+import valid from "card-validator";
 
 // Union type for both product types
 export type ProductLike =
@@ -67,3 +70,47 @@ export function normalizeProduct(product: ProductLike): NormalizedProduct {
     };
   }
 }
+
+export const cleanCardNumber = (cardNumber: string): string => {
+  return cardNumber.replace(/\s/g, ""); // Remove all spaces
+};
+
+export const formatCardNumberForDisplay = (value: string) => {
+  // If already masked, don't format
+  if (value.includes("*")) {
+    return value;
+  }
+
+  // Remove all non-digits
+  const v = value.replace(/\D/g, "");
+
+  // Add spaces every 4 digits for display
+  const matches = v.match(/\d{4,16}/g);
+  const match = (matches && matches[0]) || "";
+  const parts: string[] = [];
+  for (let i = 0, len = match.length; i < len; i += 4) {
+    parts.push(match.substring(i, i + 4));
+  }
+  if (parts.length) {
+    return parts.join(" ");
+  } else {
+    return v;
+  }
+};
+
+// Helper function to detect card type from number
+export const detectCardType = (cardNumber: string): CardTypes | null => {
+  const validation = valid.number(cardNumber);
+
+  if (validation.card && validation.card.type) {
+    // Map card-validator types to our enum
+    const typeMap: Record<string, CardTypes> = {
+      visa: CardTypes.VISA,
+      mastercard: CardTypes.MASTERCARD,
+      "american-express": CardTypes.AMERICAN_EXPRESS,
+    };
+
+    return typeMap[validation.card.type] || null;
+  }
+  return null;
+};

@@ -4,17 +4,24 @@ import { ProductListTypes } from "~/integrations/salesforce/enums";
 import {
   addItemToProductList,
   createCustomerAddress,
+  createCustomerPaymentInstrument,
   createProductList,
   customerProductLists,
   deleteCustomerAddress,
+  deleteCustomerPaymentInstrument,
   deleteItemFormProductList,
   getCustomer,
   getCustomerOrders,
+  getCustomerPaymentInstrument,
   updateCustomerAddress,
 } from "~/integrations/salesforce/server/customer";
-import { Customer } from "~/integrations/salesforce/types/api";
+import {
+  Customer,
+  CustomerPaymentInstrument,
+} from "~/integrations/salesforce/types/api";
 import {
   CreateCustomerAddressParams,
+  CreateCustomerPaymentInstrumentParams,
   CustomerOrdersParams,
 } from "~/integrations/salesforce/types/params";
 
@@ -107,5 +114,43 @@ export const useDeleteCustomerAddressMutation = () => {
     onSuccess: () => {
       router.back();
     },
+  });
+};
+
+export const useCreateCustomerPaymentInstrumentMutation = () => {
+  return useMutation({
+    mutationFn: async (data: CreateCustomerPaymentInstrumentParams) =>
+      createCustomerPaymentInstrument({ data }),
+    meta: {
+      sucessMessage: "Payment method created",
+      invalidateQuery: getCustomerQueryOptions().queryKey,
+    },
+    onSuccess: () => {
+      router.back();
+    },
+  });
+};
+
+export const useDeleteCustomerPaymentInstrumentMutation = () => {
+  return useMutation({
+    mutationFn: async (data: { paymentInstrumentId: string }) =>
+      deleteCustomerPaymentInstrument({ data }),
+    meta: {
+      sucessMessage: "Payment method deleted",
+      invalidateQuery: getCustomerQueryOptions().queryKey,
+    },
+    onSuccess: () => {
+      router.back();
+    },
+  });
+};
+
+export const getCustomerPaymentInstrumentQueryOptions = (
+  paymentInstrumentId: string,
+) => {
+  return queryOptions<CustomerPaymentInstrument>({
+    queryKey: ["customers", "paymentInstruments", paymentInstrumentId],
+    queryFn: async () =>
+      getCustomerPaymentInstrument({ data: { paymentInstrumentId } }),
   });
 };

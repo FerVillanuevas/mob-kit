@@ -1,4 +1,6 @@
+import valid from "card-validator";
 import { z } from "zod";
+import { CardTypes } from "~/integrations/salesforce/enums";
 
 export const CustomerSchema = z.object({
   customerId: z.string().optional(),
@@ -51,3 +53,81 @@ export const RegisterSchema = z.object({
 });
 
 export type RegisterFormData = z.infer<typeof RegisterSchema>;
+
+export const PaymentCardSchema = z
+  .object({
+    paymentMethodId: z.string().min(1, "Payment method is required"),
+
+    cardType: z.nativeEnum(CardTypes, {
+      errorMap: () => ({ message: "Invalid card type" }),
+    }),
+
+    number: z
+      .string()
+      .min(1, "Card number is required")
+      .refine(
+        (value) => {
+          const validation = valid.number(value);
+          return validation.isValid;
+        },
+        {
+          message: "Invalid card number",
+        },
+      ),
+
+    expirationMonth: z
+      .number()
+      .min(1, "Expiration month is required")
+      .max(12, "Month must be between 1 and 12")
+      .refine(
+        (value) => {
+          const validation = valid.expirationMonth(value.toString());
+          return validation.isValid;
+        },
+        {
+          message: "Invalid expiration month",
+        },
+      ),
+
+    expirationYear: z
+      .number()
+      .min(new Date().getFullYear(), "Card has expired")
+      .refine(
+        (value) => {
+          const validation = valid.expirationYear(value.toString());
+          return validation.isValid;
+        },
+        {
+          message: "Invalid expiration year",
+        },
+      ),
+
+    holder: z
+      .string()
+      .min(1, "Cardholder name is required")
+      .refine(
+        (value) => {
+          const validation = valid.cardholderName(value);
+          return validation.isValid;
+        },
+        {
+          message: "Invalid cardholder name",
+        },
+      ),
+  })
+  .refine(
+    (data) => {
+      // Validate expiration date combination
+      const validation = valid.expirationDate({
+        month: data.expirationMonth.toString(),
+        year: data.expirationYear.toString(),
+      });
+      return validation.isValid;
+    },
+    {
+      message: "Invalid expiration date",
+      path: ["expirationMonth"], // This will show the error on the month field
+    },
+  );
+
+export type PaymentCardFormData = z.infer<typeof PaymentCardSchema>;

@@ -1,4 +1,7 @@
-import type { ShopperBasketsTypes } from "commerce-sdk-isomorphic";
+import type {
+  ShopperBasketsTypes,
+  ShopperCustomersTypes,
+} from "commerce-sdk-isomorphic";
 import { Address } from "~/integrations/salesforce/types/api";
 
 export interface SalesforceConfig {
@@ -129,6 +132,11 @@ export interface SearchSuggestionsParams {
 export interface CreateCustomerAddressParams {
   params?: {};
   body: Address;
+}
+
+export interface CreateCustomerPaymentInstrumentParams {
+  params?: {};
+  body: ShopperCustomersTypes.CustomerPaymentInstrumentRequest;
 }
 
 export interface AddressCallback {

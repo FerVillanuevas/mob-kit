@@ -7,7 +7,12 @@ export enum ProductListTypes {
   CUSTOM_3 = "custom_3",
 }
 
-
 export enum AuthTypes {
-  REGISTERED = "registered"
+  REGISTERED = "registered",
+}
+
+export enum CardTypes {
+  VISA = "Visa",
+  MASTERCARD = "MasterCard",
+  AMERICAN_EXPRESS = "AmericanExpress",
 }

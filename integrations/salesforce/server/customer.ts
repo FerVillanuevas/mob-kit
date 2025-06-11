@@ -7,6 +7,7 @@ import {
 } from "~/integrations/salesforce/server/config";
 import {
   CreateCustomerAddressParams,
+  CreateCustomerPaymentInstrumentParams,
   CustomerOrdersParams,
 } from "~/integrations/salesforce/types/params";
 import { RegisterFormData } from "~/lib/forms/customer";
@@ -205,6 +206,57 @@ export const deleteItemFormProductList = async ({
       customerId: customerId,
       listId: data.listId,
       itemId: data.itemId,
+    },
+  });
+};
+
+export const createCustomerPaymentInstrument = async ({
+  data,
+}: {
+  data: CreateCustomerPaymentInstrumentParams;
+}) => {
+  const { api, client } = await getSalesforceAPI();
+  const shopperCustomers = await api.shopperCustomers();
+  const customerId = await client.getCustomerId();
+
+  return await shopperCustomers.createCustomerPaymentInstrument({
+    parameters: {
+      customerId: customerId,
+    },
+    body: data.body,
+  });
+};
+
+export const deleteCustomerPaymentInstrument = async ({
+  data,
+}: {
+  data: { paymentInstrumentId: string };
+}) => {
+  const { api, client } = await getSalesforceAPI();
+  const shopperCustomers = await api.shopperCustomers();
+  const customerId = await client.getCustomerId();
+
+  return await shopperCustomers.deleteCustomerPaymentInstrument({
+    parameters: {
+      customerId: customerId,
+      paymentInstrumentId: data.paymentInstrumentId,
+    },
+  });
+};
+
+export const getCustomerPaymentInstrument = async ({
+  data,
+}: {
+  data: { paymentInstrumentId: string };
+}) => {
+  const { api, client } = await getSalesforceAPI();
+  const shopperCustomers = await api.shopperCustomers();
+  const customerId = await client.getCustomerId();
+
+  return await shopperCustomers.getCustomerPaymentInstrument({
+    parameters: {
+      customerId: customerId,
+      paymentInstrumentId: data.paymentInstrumentId,
     },
   });
 };

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
+import { randomUUID } from "expo-crypto";
 import { router, useLocalSearchParams } from "expo-router";
-import { nanoid } from "nanoid";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 import { z } from "zod";
@@ -70,7 +70,7 @@ export default function CustomerAddressDetail() {
     try {
       if (isNew) {
         await createMutation.mutateAsync({
-          body: { ...data, addressId: nanoid() },
+          body: { ...data, addressId: randomUUID() },
         });
       } else {
         await updateMutation.mutateAsync({ body: { ...data, addressId: id } });
