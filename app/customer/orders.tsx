@@ -5,8 +5,8 @@ import { TouchableOpacity, View } from "react-native";
 import EmptyHero from "~/components/commerce/empty-hero";
 import { Pagination } from "~/components/commerce/pagination";
 import Icon from "~/components/icon";
+import HorizontalList from "~/components/skeletons/horizontal-items-skeleton";
 import { Separator } from "~/components/ui/separator";
-import { Skeleton } from "~/components/ui/skeleton";
 import { Text } from "~/components/ui/text";
 import { getCustomerOrdersQueryOptions } from "~/integrations/salesforce/options/customer";
 import { REQUESTED_LIMIT } from "~/lib/constants";
@@ -27,20 +27,7 @@ export default function CustomerOrders() {
   };
 
   if (isLoading) {
-    return (
-      <View className="flex flex-1 p-4">
-        <Text className="mb-4 text-2xl font-bold">My Orders</Text>
-        <View className="space-y-4">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <View key={index} className="border-b border-border p-4">
-              <Skeleton className="mb-2 h-6 w-3/4" pulse />
-              <Skeleton className="mb-2 h-4 w-1/2" pulse />
-              <Skeleton className="h-4 w-1/3" pulse />
-            </View>
-          ))}
-        </View>
-      </View>
-    );
+    return <HorizontalList />;
   }
 
   if (!data) {
@@ -73,7 +60,8 @@ export default function CustomerOrders() {
                     Status: {item.status || "N/A"}
                   </Text>
                   <Text className="text-sm text-muted-foreground">
-                    Total: {item.orderTotal ? `$${item.orderTotal.toFixed(2)}` : "N/A"}
+                    Total:{" "}
+                    {item.orderTotal ? `$${item.orderTotal.toFixed(2)}` : "N/A"}
                   </Text>
                 </View>
                 <Icon name="chevron-forward" size={20} />

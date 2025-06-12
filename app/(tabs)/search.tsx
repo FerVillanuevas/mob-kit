@@ -7,9 +7,11 @@ import { debounce } from "lodash";
 import { useState } from "react";
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 import AvoidingBlur from "~/components/avoiding-blur";
+import AnimatedStateView from "~/components/commerce/animated-state-view";
 import EmptyHero from "~/components/commerce/empty-hero";
 import Icon from "~/components/icon";
 import Image from "~/components/image";
+import HorizontalList from "~/components/skeletons/horizontal-items-skeleton";
 import { Input } from "~/components/ui/input";
 import { H4, P } from "~/components/ui/typography";
 import { getProductsByIdsQueryOptions } from "~/integrations/salesforce/options/products";
@@ -52,7 +54,7 @@ const SearchResult = ({
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data } = useQuery(
+  const { data, isError, refetch, isFetching } = useQuery(
     getSearchSuggestionsOptions({
       q: searchQuery,
     }),
@@ -74,9 +76,24 @@ export default function SearchPage() {
 
   const products = productsResult?.data || [];
 
+  // Determine state
+  const getState = () => {
+    if (productsLoading || isFetching) return "loading";
+    if (isError) return "error";
+    if (!data?.productSuggestions?.products && !productsLoading) return "empty";
+    return "success";
+  };
+
   return (
     <View className="flex flex-1 p-4">
-      {data?.productSuggestions?.products ? (
+      <AnimatedStateView
+        state={getState()}
+        duration={250}
+        animationPreset="fade"
+        loadingComponent={<HorizontalList />}
+        errorComponent={<EmptyHero title="Search products" hideButton />}
+        emptyComponent={<EmptyHero title="Search products" hideButton />}
+      >
         <FlashList
           data={data?.productSuggestions?.products}
           estimatedItemSize={100}
@@ -102,9 +119,8 @@ export default function SearchPage() {
             );
           }}
         />
-      ) : (
-        <EmptyHero title="Search products" hideButton />
-      )}
+      </AnimatedStateView>
+
       <AvoidingBlur bottom={0} style={{ paddingBottom: 8 }}>
         <Input placeholder="Search" onChangeText={handleChangeText} />
       </AvoidingBlur>

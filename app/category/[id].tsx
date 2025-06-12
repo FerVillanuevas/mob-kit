@@ -77,12 +77,9 @@ export default function CategoryPage() {
       console.log("[MOBILE] Navigating with params:", serializedParams);
     }
 
-    router.replace({
-      pathname: "/category/[id]",
-      params: {
-        id: categoryId,
-        ...serializedParams,
-      },
+    router.setParams({
+      id: categoryId,
+      ...serializedParams,
     });
   };
 
