@@ -1,27 +1,25 @@
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useQuery } from "@tanstack/react-query";
-import type { ShopperBasketsTypes } from "commerce-sdk-isomorphic";
+import { ShopperBasketsTypes } from "commerce-sdk-isomorphic";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
+import AvoidingBlur from "~/components/avoiding-blur";
 import Carousel from "~/components/carousel";
+import EmptyHero from "~/components/commerce/empty-hero";
 import ProductRecomendations from "~/components/commerce/product-recomandations";
 import { ProductVariations } from "~/components/commerce/product-variations";
 import { QuantitySelector } from "~/components/commerce/quantity-selector";
 import Icon from "~/components/icon";
-import { Badge } from "~/components/ui/badge";
+import Loading from "~/components/loading";
 import { Button } from "~/components/ui/button";
-import MaskedBlur from "~/components/ui/masked-blur";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { H1, H3 } from "~/components/ui/typography";
-import { useWishList } from "~/hooks/use-wishlist";
 import { useAddItemToBasketMutation } from "~/integrations/salesforce/options/basket";
 import { useAddItemToProductListMutation } from "~/integrations/salesforce/options/customer";
 import { getProductQueryOptions } from "~/integrations/salesforce/options/products";
@@ -107,22 +105,16 @@ export default function ProductPage() {
     pid?: string;
   }>();
 
-  const { wishList } = useWishList();
-
+  const [wishListed] = useState(true);
   const [selectedVariations, setSelectedVariations] = useState<
     Record<string, string>
   >({});
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("description");
 
-  const { width, height } = useWindowDimensions();
-  const h = useHeaderHeight();
+  const addToBasketMutation = useAddItemToBasketMutation();
+  const addToWishListMutation = useAddItemToProductListMutation();
 
-  const {
-    data: product,
-    isLoading,
-    isError,
-  } = useQuery(
+  const { data: product, isLoading } = useQuery(
     getProductQueryOptions({
       id,
       perPricebook: true,
@@ -139,84 +131,6 @@ export default function ProductPage() {
       allImages: true,
     }),
   );
-
-  const addToBasketMutation = useAddItemToBasketMutation();
-  const addToWishListMutation = useAddItemToProductListMutation();
-
-  // Initialize default selections
-  useEffect(() => {
-    if (product?.variationAttributes && product?.variants) {
-      const defaultSelections = getDefaultSelections(
-        product.variationAttributes,
-        product.variants,
-      );
-
-      // Parse URL variations if they exist
-      let parsedUrlVariations = {};
-      if (urlVariations) {
-        try {
-          parsedUrlVariations = JSON.parse(urlVariations);
-        } catch (e) {
-          console.warn("Failed to parse URL variations:", e);
-        }
-      }
-
-      // Merge URL variations with defaults (URL takes precedence)
-      const initialSelections = {
-        ...defaultSelections,
-        ...parsedUrlVariations,
-      };
-
-      setSelectedVariations(initialSelections);
-
-      // Set initial quantity
-      setQuantity(product.minOrderQuantity || 1);
-    }
-  }, [product?.variationAttributes, product?.variants, urlVariations]);
-
-  // Find the selected variant
-  const selectedVariant = product?.variants?.find((variant) => {
-    return Object.entries(selectedVariations).every(([attrId, value]) => {
-      return variant.variationValues?.[attrId] === value;
-    });
-  });
-
-  const { minOrderQuantity = 1, stepQuantity = 1 } = product || {};
-  const isInStock =
-    selectedVariant?.orderable !== false &&
-    selectedVariant?.inventory?.stockLevel !== 0;
-  const stockLevel =
-    selectedVariant?.inventory?.stockLevel || product?.inventory?.stockLevel;
-  const promotion = product?.productPromotions?.[0];
-
-  // Calculate stock status
-  const getStockStatus = () => {
-    if (!isInStock)
-      return { status: "out-of-stock", color: "red", text: "Out of Stock" };
-    if (stockLevel && stockLevel <= 5)
-      return {
-        status: "low-stock",
-        color: "orange",
-        text: `Only ${stockLevel} left`,
-      };
-    if (stockLevel && stockLevel <= 20)
-      return { status: "limited", color: "yellow", text: "Limited Stock" };
-    return { status: "in-stock", color: "green", text: "In Stock" };
-  };
-
-  const stockStatus = getStockStatus();
-
-  const handleQuantityChange = (delta: number) => {
-    const newQuantity = Math.max(minOrderQuantity, quantity + delta);
-    if (stepQuantity > 1) {
-      const remainder = (newQuantity - minOrderQuantity) % stepQuantity;
-      setQuantity(
-        remainder === 0 ? newQuantity : newQuantity - remainder + stepQuantity,
-      );
-    } else {
-      setQuantity(newQuantity);
-    }
-  };
 
   const handleVariationChange = (newVariations: Record<string, string>) => {
     setSelectedVariations(newVariations);
@@ -251,76 +165,71 @@ export default function ProductPage() {
     });
   };
 
-  const handleAddToWishList = async () => {
-    if (!wishList?.id) {
-      return;
-    }
-
-    await addToWishListMutation.mutateAsync({
-      listId: wishList.id,
-      productId: id,
+  // Find the selected variant
+  const selectedVariant = product?.variants?.find((variant) => {
+    return Object.entries(selectedVariations).every(([attrId, value]) => {
+      return variant.variationValues?.[attrId] === value;
     });
-  };
+  });
 
-  const wishListed = wishList?.customerProductListItems?.some(
-    (p) => p.id === id,
-  );
-
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" />
-        <Text className="mt-4 text-muted-foreground">Loading product...</Text>
-      </View>
-    );
-  }
-
-  if (isError || !product) {
-    return (
-      <View className="flex-1 items-center justify-center bg-background p-4">
-        <Icon name="alert-circle" className="mb-4 text-destructive" size={48} />
-        <H3 className="mb-2 text-center">Product Not Found</H3>
-        <Text className="mb-4 text-center text-muted-foreground">
-          The product youre looking for doesnt exist or has been removed.
-        </Text>
-        <Button onPress={() => router.back()}>
-          <Text>Go Back</Text>
-        </Button>
-      </View>
-    );
-  }
-
-  const largeImages = product.imageGroups?.find(
+  const largeImages = product?.imageGroups?.find(
     (ig) => ig.viewType === "large",
   );
+
   const images =
     largeImages?.images?.map((image) => image.disBaseLink || "") || [];
 
-  const tabs = [
-    { id: "description", label: "Description" },
-    { id: "specifications", label: "Specs" },
-  ];
+  const isInStock =
+    selectedVariant?.orderable !== false &&
+    selectedVariant?.inventory?.stockLevel !== 0;
+  const stockLevel =
+    selectedVariant?.inventory?.stockLevel || product?.inventory?.stockLevel;
+
+  // Initialize default selections
+  useEffect(() => {
+    if (product?.variationAttributes && product?.variants) {
+      const defaultSelections = getDefaultSelections(
+        product.variationAttributes,
+        product.variants,
+      );
+
+      // Parse URL variations if they exist
+      let parsedUrlVariations = {};
+      if (urlVariations) {
+        try {
+          parsedUrlVariations = JSON.parse(urlVariations);
+        } catch (e) {
+          console.warn("Failed to parse URL variations:", e);
+        }
+      }
+
+      // Merge URL variations with defaults (URL takes precedence)
+      const initialSelections = {
+        ...defaultSelections,
+        ...parsedUrlVariations,
+      };
+
+      setSelectedVariations(initialSelections);
+
+      // Set initial quantity
+      setQuantity(product.minOrderQuantity || 1);
+    }
+  }, [product?.variationAttributes, product?.variants, urlVariations]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (!product) {
+    return <EmptyHero />;
+  }
 
   return (
-    <View style={{ width, height: height - h }}>
+    <View className="flex flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Product Images */}
         {images.length > 0 && (
           <View className="relative">
-            {promotion && (
-              <Badge className="absolute left-4 top-4 z-10 bg-destructive">
-                <View className="flex-row items-center">
-                  <Icon
-                    name="flash"
-                    className="mr-1 text-destructive-foreground"
-                    size={12}
-                  />
-                  <Text className="text-xs text-destructive-foreground">
-                    {promotion.calloutMsg || "Special Offer"}
-                  </Text>
-                </View>
-              </Badge>
-            )}
             <Carousel data={images} />
           </View>
         )}
@@ -331,7 +240,7 @@ export default function ProductPage() {
               {product.name}
             </H1>
             <TouchableOpacity
-              onPress={handleAddToWishList}
+              onPress={() => {}}
               className={cn(
                 "rounded-full border p-2",
                 wishListed
@@ -363,51 +272,15 @@ export default function ProductPage() {
               />
             )}
 
-          {/* Quantity Selector */}
           <View className="gap-3">
             <View className="flex-row items-center justify-between">
               <H3>Quantity</H3>
-              <Badge
-                className={cn(
-                  stockStatus.color === "green" &&
-                    "border-green-200 bg-green-50",
-                  stockStatus.color === "orange" &&
-                    "border-orange-200 bg-orange-50",
-                  stockStatus.color === "red" && "border-red-200 bg-red-50",
-                )}
-              >
-                <View className="flex-row items-center gap-1">
-                  <Icon
-                    name={
-                      stockStatus.color === "green"
-                        ? "checkmark-circle"
-                        : "alert-circle"
-                    }
-                    className={cn(
-                      stockStatus.color === "green" && "text-green-600",
-                      stockStatus.color === "orange" && "text-orange-600",
-                      stockStatus.color === "red" && "text-red-600",
-                    )}
-                    size={12}
-                  />
-                  <Text
-                    className={cn(
-                      "text-xs",
-                      stockStatus.color === "green" && "text-green-800",
-                      stockStatus.color === "orange" && "text-orange-800",
-                      stockStatus.color === "red" && "text-red-800",
-                    )}
-                  >
-                    {stockStatus.text}
-                  </Text>
-                </View>
-              </Badge>
             </View>
 
             <QuantitySelector
               value={quantity}
               onValueChange={setQuantity}
-              min={minOrderQuantity}
+              min={1}
               max={stockLevel || 999}
               disabled={!isInStock}
             />
@@ -430,15 +303,15 @@ export default function ProductPage() {
         </View>
       </ScrollView>
 
-      <View className="pb-safe absolute inset-x-0 bottom-0 flex flex-row gap-8 px-4 pt-8">
-        <MaskedBlur />
-
+      <AvoidingBlur
+        bottom={0}
+        className="pb-safe flex flex-row gap-4 px-4 pt-4"
+      >
         {/* Add to Cart Button */}
         <Price
           price={selectedVariant?.price || product.price}
           currency={product.currency}
           priceMax={product.priceMax}
-          promotion={promotion}
         />
 
         <Button
@@ -457,7 +330,7 @@ export default function ProductPage() {
             </Text>
           </View>
         </Button>
-      </View>
+      </AvoidingBlur>
     </View>
   );
 }

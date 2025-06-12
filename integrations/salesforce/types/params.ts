@@ -49,12 +49,27 @@ export interface CustomerOrdersParams {
   limit?: number;
 }
 
+export interface SearchProductsParams {
+  select?: string;
+  q?: string;
+  refine?: Array<string>;
+  sort?: string;
+  currency?: string;
+  locale?: string;
+  expand?: Array<string>;
+  allImages?: boolean;
+  perPricebook?: boolean;
+  allVariationProperties?: boolean;
+  offset?: any;
+  limit?: number;
+}
+
 export interface GetProductParams {
   id: string;
   select?: string;
   inventoryIds?: string;
   currency?: string;
-  expand?: string[];
+  expand?: Array<string>;
   locale?: string;
   allImages?: boolean;
   perPricebook?: boolean;

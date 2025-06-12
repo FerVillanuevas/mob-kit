@@ -27,7 +27,7 @@ import {
 export const getCustomerQueryOptions = () => {
   return queryOptions<Customer>({
     queryKey: ["customers"],
-    queryFn: async () => getCustomer(),
+    queryFn: async () => getCustomer({ data: {} }),
   });
 };
 
@@ -41,7 +41,7 @@ export const getCustomerOrdersQueryOptions = (data: CustomerOrdersParams) => {
 export const getProductListQueryOptions = () => {
   return queryOptions({
     queryKey: ["customers", "productLists"],
-    queryFn: async () => customerProductLists(),
+    queryFn: async () => customerProductLists({ data: {} }),
   });
 };
 

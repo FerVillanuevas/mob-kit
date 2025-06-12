@@ -40,7 +40,7 @@ export const useAddItemToBasketMutation = () => {
 
 export const useMergeBasketMutation = () => {
   return useMutation({
-    mutationFn: async () => mergeBasket(),
+    mutationFn: async () => mergeBasket({ data: {} }),
   });
 };
 
@@ -133,7 +133,7 @@ export const getShippingMethodsForShipmentQueryOptions = ({
 export const getBasketQueryOptions = () => {
   return queryOptions({
     queryKey: ["basket"],
-    queryFn: async () => getBasket(),
+    queryFn: async () => getBasket({ data: {} }),
   });
 };
 

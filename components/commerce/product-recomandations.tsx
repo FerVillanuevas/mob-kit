@@ -59,17 +59,21 @@ export default function ProductRecomendations({
   }
 
   return (
-    <FlashList
-      data={data.recs}
-      ListEmptyComponent={
-        <View className="flex h-[168] w-full items-center justify-center">
-          <H3>No recomendations</H3>
-        </View>
-      }
-      estimatedItemSize={168}
-      showsHorizontalScrollIndicator={false}
-      horizontal
-      renderItem={renderItem}
-    />
+    <View className="gap-3">
+      <H3>Product Recomendations</H3>
+
+      <FlashList
+        data={data.recs}
+        ListEmptyComponent={
+          <View className="flex h-[168] w-full items-center justify-center">
+            <H3>No recomendations</H3>
+          </View>
+        }
+        estimatedItemSize={168}
+        showsHorizontalScrollIndicator={false}
+        horizontal
+        renderItem={renderItem}
+      />
+    </View>
   );
 }

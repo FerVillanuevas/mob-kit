@@ -25,7 +25,7 @@ export const getProductsQueryOptions = (params: ProductSearchParams) => {
 };
 
 export const getInfinityProductsQueryOptions = (
-  params: ProductSearchParams
+  params: ProductSearchParams,
 ) => {
   return infiniteQueryOptions({
     queryKey: ["products", "infinity", "list", params],
@@ -43,7 +43,7 @@ export const getInfinityProductsQueryOptions = (
 
 export const getProductQueryOptions = (params: GetProductParams) => {
   return queryOptions<ShopperProductsTypes.Product>({
-    queryKey: ["product", params],
+    queryKey: ["product", { ...params }],
     queryFn: async () => {
       return getProduct({ data: params });
     },
@@ -51,7 +51,7 @@ export const getProductQueryOptions = (params: GetProductParams) => {
 };
 
 export const getProductsByIdsQueryOptions = (
-  params: GetProductsByIdsParams
+  params: GetProductsByIdsParams,
 ) => {
   return queryOptions({
     queryKey: ["products", params],

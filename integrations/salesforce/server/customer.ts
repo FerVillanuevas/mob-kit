@@ -1,10 +1,5 @@
 import { ShopperCustomersTypes } from "commerce-sdk-isomorphic";
-import { SalesforceCommerceClient } from "~/integrations/salesforce/client";
 import { ProductListTypes } from "~/integrations/salesforce/enums";
-import {
-  getSalesforceAPI,
-  salesforceConfig,
-} from "~/integrations/salesforce/server/config";
 import {
   CreateCustomerAddressParams,
   CreateCustomerPaymentInstrumentParams,
@@ -13,132 +8,111 @@ import {
 import { createCommerceFunction } from "~/integrations/salesforce/utils";
 import { RegisterFormData } from "~/lib/forms/customer";
 
-export const authenticateCustomer = async ({
-  data,
-}: {
-  data: {
-    username: string;
-    password: string;
-  };
-}) => {
-  const client = new SalesforceCommerceClient(salesforceConfig);
-  await client.authenticateCustomer(data.username, data.password);
-  return { success: true };
-};
+export const authenticateCustomer = createCommerceFunction(
+  async (_, client, data: { username: string; password: string }) => {
+    await client.authenticateCustomer(data.username, data.password);
+    return { success: true };
+  },
+);
 
-export const registerCustomer = async ({
-  data,
-}: {
-  data: RegisterFormData;
-}) => {
-  const { api, client } = await getSalesforceAPI();
-  const shopperCustomers = await api.shopperCustomers();
+export const registerCustomer = createCommerceFunction(
+  async (api, client, data: RegisterFormData) => {
+    const shopperCustomers = await api.shopperCustomers();
 
-  await shopperCustomers.registerCustomer({
-    parameters: {},
-    body: {
-      customer: {
-        login: data.email,
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
+    await shopperCustomers.registerCustomer({
+      parameters: {},
+      body: {
+        customer: {
+          login: data.email,
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+        },
+        password: data.password,
       },
-      password: data.password,
-    },
-  });
+    });
 
-  return await client.authenticateCustomer(data.email, data.password);
-};
+    return await client.authenticateCustomer(data.email, data.password);
+  },
+);
 
-export const logoutCustomer = async () => {
-  const client = new SalesforceCommerceClient(salesforceConfig);
+export const logoutCustomer = createCommerceFunction(async (_, client) => {
   await client.authenticateAsGuest();
   return { success: true };
-};
+});
 
-export const getCustomer = async () => {
-  const { api, client } = await getSalesforceAPI();
-  const shopperProducts = await api.shopperCustomers();
+export const getCustomer = createCommerceFunction(async (api, client) => {
+  const shopperCustomers = await api.shopperCustomers();
   const customerId = await client.getCustomerId();
-  return await shopperProducts.getCustomer({
+  return await shopperCustomers.getCustomer({
     parameters: {
       customerId: customerId,
     },
   });
-};
+});
 
-export const customerProductLists = async () => {
-  const { api, client } = await getSalesforceAPI();
-  const shopperCustomers = await api.shopperCustomers();
-  const customerId = await client.getCustomerId();
-  return await shopperCustomers.getCustomerProductLists({
-    parameters: {
-      customerId: customerId,
-    },
-  });
-};
+export const customerProductLists = createCommerceFunction(
+  async (api, client) => {
+    const shopperCustomers = await api.shopperCustomers();
+    const customerId = await client.getCustomerId();
+    return await shopperCustomers.getCustomerProductLists({
+      parameters: {
+        customerId: customerId,
+      },
+    });
+  },
+);
 
-export const createProductList = async ({
-  data,
-}: {
-  data: { type: ProductListTypes };
-}) => {
-  const { api, client } = await getSalesforceAPI();
+export const createProductList = createCommerceFunction(
+  async (api, client, data: { type: ProductListTypes }) => {
+    const shopperCustomers = await api.shopperCustomers();
+    const customerId = await client.getCustomerId();
 
-  const shopperCustomers = await api.shopperCustomers();
-  const customerId = await client.getCustomerId();
+    return shopperCustomers.createCustomerProductList({
+      body: {
+        type: data.type,
+      },
+      parameters: {
+        customerId: customerId,
+      },
+    });
+  },
+);
 
-  return shopperCustomers.createCustomerProductList({
-    body: {
-      type: data.type,
-    },
-    parameters: {
-      customerId: customerId,
-    },
-  });
-};
+export const addItemToProductList = createCommerceFunction(
+  async (api, client, data: { listId: string; productId: string }) => {
+    const customerId = await client.getCustomerId();
+    const shopperCustomers = await api.shopperCustomers();
 
-export const addItemToProductList = async ({
-  data,
-}: {
-  data: { listId: string; productId: string };
-}) => {
-  const { api, client } = await getSalesforceAPI();
-  const customerId = await client.getCustomerId();
+    return await shopperCustomers.createCustomerProductListItem({
+      parameters: {
+        customerId: customerId,
+        listId: data.listId,
+      },
+      body: {
+        quantity: 1,
+        productId: data.productId,
+        public: false,
+        priority: 1,
+        type: "product",
+      },
+    });
+  },
+);
 
-  const shopperCustomers = await api.shopperCustomers();
+export const getCustomerOrders = createCommerceFunction(
+  async (api, client, data: CustomerOrdersParams) => {
+    const shopperCustomers = await api.shopperCustomers();
+    const customerId = await client.getCustomerId();
 
-  return await shopperCustomers.createCustomerProductListItem({
-    parameters: {
-      customerId: customerId,
-      listId: data.listId,
-    },
-    body: {
-      quantity: 1,
-      productId: data.productId,
-      public: false,
-      priority: 1,
-      type: "product",
-    },
-  });
-};
-
-export const getCustomerOrders = async ({
-  data,
-}: {
-  data: CustomerOrdersParams;
-}) => {
-  const { api, client } = await getSalesforceAPI();
-  const shopperCustomers = await api.shopperCustomers();
-  const customerId = await client.getCustomerId();
-
-  return (await shopperCustomers.getCustomerOrders({
-    parameters: {
-      customerId,
-      ...data,
-    },
-  })) as ShopperCustomersTypes.CustomerOrderResult;
-};
+    return (await shopperCustomers.getCustomerOrders({
+      parameters: {
+        customerId,
+        ...data,
+      },
+    })) as ShopperCustomersTypes.CustomerOrderResult;
+  },
+);
 
 export const createCustomerAddress = createCommerceFunction(
   async (api, client, data: CreateCustomerAddressParams) => {
@@ -172,75 +146,62 @@ export const updateCustomerAddress = createCommerceFunction(
   },
 );
 
-export const deleteCustomerAddress = async ({
-  data,
-}: {
-  data: { addressId: string };
-}) => {
-  const { api, client } = await getSalesforceAPI();
-  const shopperCustomers = await api.shopperCustomers();
-  const customerId = await client.getCustomerId();
+export const deleteCustomerAddress = createCommerceFunction(
+  async (api, client, data: { addressId: string }) => {
+    const shopperCustomers = await api.shopperCustomers();
+    const customerId = await client.getCustomerId();
 
-  return await shopperCustomers.removeCustomerAddress({
-    parameters: {
-      customerId: customerId,
-      addressName: data.addressId,
-    },
-  });
-};
+    return await shopperCustomers.removeCustomerAddress({
+      parameters: {
+        customerId: customerId,
+        addressName: data.addressId,
+      },
+    });
+  },
+);
 
-export const deleteItemFormProductList = async ({
-  data,
-}: {
-  data: { listId: string; itemId: string };
-}) => {
-  const { api, client } = await getSalesforceAPI();
+export const deleteItemFormProductList = createCommerceFunction(
+  async (api, client, data: { listId: string; itemId: string }) => {
+    const customerId = await client.getCustomerId();
+    const shopperCustomers = await api.shopperCustomers();
 
-  const customerId = await client.getCustomerId();
-  const shopperCustomers = await api.shopperCustomers();
+    return await shopperCustomers.deleteCustomerProductListItem({
+      parameters: {
+        customerId: customerId,
+        listId: data.listId,
+        itemId: data.itemId,
+      },
+    });
+  },
+);
 
-  return await shopperCustomers.deleteCustomerProductListItem({
-    parameters: {
-      customerId: customerId,
-      listId: data.listId,
-      itemId: data.itemId,
-    },
-  });
-};
+export const createCustomerPaymentInstrument = createCommerceFunction(
+  async (api, client, data: CreateCustomerPaymentInstrumentParams) => {
+    const shopperCustomers = await api.shopperCustomers();
+    const customerId = await client.getCustomerId();
 
-export const createCustomerPaymentInstrument = async ({
-  data,
-}: {
-  data: CreateCustomerPaymentInstrumentParams;
-}) => {
-  const { api, client } = await getSalesforceAPI();
-  const shopperCustomers = await api.shopperCustomers();
-  const customerId = await client.getCustomerId();
+    return await shopperCustomers.createCustomerPaymentInstrument({
+      parameters: {
+        customerId: customerId,
+      },
+      body: data.body,
+    });
+  },
+);
 
-  return await shopperCustomers.createCustomerPaymentInstrument({
-    parameters: {
-      customerId: customerId,
-    },
-    body: data.body,
-  });
-};
+export const deleteCustomerPaymentInstrument = createCommerceFunction(
+  async (api, client, data: { paymentInstrumentId: string }) => {
+    const shopperCustomers = await api.shopperCustomers();
+    const customerId = await client.getCustomerId();
 
-export const deleteCustomerPaymentInstrument = async ({
-  data,
-}: {
-  data: { paymentInstrumentId: string };
-}) => {
-  const { api, client } = await getSalesforceAPI();
-  const shopperCustomers = await api.shopperCustomers();
-  const customerId = await client.getCustomerId();
-
-  return await shopperCustomers.deleteCustomerPaymentInstrument({
-    parameters: {
-      customerId: customerId,
-      paymentInstrumentId: data.paymentInstrumentId,
-    },
-  });
-};
+    return await shopperCustomers.deleteCustomerPaymentInstrument({
+      parameters: {
+        customerId: customerId,
+        paymentInstrumentId: data.paymentInstrumentId,
+      },
+    });
+  },
+);
 
 export const getCustomerPaymentInstrument = createCommerceFunction(
   async (api, client, data: { paymentInstrumentId: string }) => {
