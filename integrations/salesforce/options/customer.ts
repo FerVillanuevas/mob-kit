@@ -15,10 +15,9 @@ import {
   getCustomerPaymentInstrument,
   updateCustomerAddress,
 } from "~/integrations/salesforce/server/customer";
-import {
-  Customer,
-  CustomerPaymentInstrument,
-} from "~/integrations/salesforce/types/api";
+
+import { Customer } from "~/integrations/salesforce/types/api";
+
 import {
   CreateCustomerAddressParams,
   CreateCustomerPaymentInstrumentParams,
@@ -85,8 +84,11 @@ export const useCreateCustumerAddressMutation = () => {
   return useMutation({
     mutationFn: async (data: CreateCustomerAddressParams) =>
       createCustomerAddress({ data }),
+    onSuccess: console.log,
+    onError: console.log,
     meta: {
       sucessMessage: "New Address created",
+      errorMessage: "Something went worng",
       invalidateQuery: getCustomerQueryOptions().queryKey,
     },
   });
@@ -98,6 +100,7 @@ export const useUpdateCustomerAddressMutation = () => {
       updateCustomerAddress({ data }),
     meta: {
       sucessMessage: "Address updated",
+      errorMessage: "Something went worng",
       invalidateQuery: getCustomerQueryOptions().queryKey,
     },
   });
@@ -148,7 +151,7 @@ export const useDeleteCustomerPaymentInstrumentMutation = () => {
 export const getCustomerPaymentInstrumentQueryOptions = (
   paymentInstrumentId: string,
 ) => {
-  return queryOptions<CustomerPaymentInstrument>({
+  return queryOptions({
     queryKey: ["customers", "paymentInstruments", paymentInstrumentId],
     queryFn: async () =>
       getCustomerPaymentInstrument({ data: { paymentInstrumentId } }),
